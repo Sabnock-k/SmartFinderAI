@@ -46,7 +46,7 @@ function FollowMouseCamera() {
 
 function Cube() {
   const meshRef = useRef()
-  const texture = useLoader(TextureLoader, '/src/assets/map.jpg')
+  const texture = useLoader(TextureLoader, '/public/assets/map.jpg')
   useFrame(() => {
     if (meshRef.current) {
       meshRef.current.rotation.y += 0.007
@@ -78,7 +78,7 @@ function FloatingTexts() {
         outlineColor="#161b22"
         outlineWidth={0.008}
         rotation={[0, 0, 0]}
-        font={'/src/assets/oswald-font.ttf'}
+        font={'/public/assets/oswald-font.ttf'}
       >
         MAP
       </Text>
@@ -92,7 +92,7 @@ function FloatingTexts() {
         outlineColor="#161b22"
         outlineWidth={0.008}
         rotation={[0, 0, 0]}
-        font={'/src/assets/oswald-font.ttf'}
+        font={'/public/assets/oswald-font.ttf'}
       >
         COMMING SOON
       </Text>
