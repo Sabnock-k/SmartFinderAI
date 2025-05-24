@@ -2,7 +2,7 @@ import './MapBoxComming.css'
 import { useRef, useState } from 'react'
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
 import { TextureLoader } from 'three'
-import { RenderTexture, PerspectiveCamera, Text, ContactShadows } from '@react-three/drei'
+import { Text } from '@react-three/drei'
 
 export default function MapBoxComming() {
   return (
