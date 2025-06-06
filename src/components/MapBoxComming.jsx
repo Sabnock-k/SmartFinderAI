@@ -94,7 +94,7 @@ function FloatingTexts() {
         rotation={[0, 0, 0]}
         font={'/assets/oswald-font.ttf'}
       >
-        COMMING SOON
+        COMING SOON
       </Text>
     </>
   )
