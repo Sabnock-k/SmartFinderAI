@@ -1,10 +1,14 @@
+import React, { useState } from "react";
 import axios from "axios";
-import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import '../index.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../index.css";
 
-function Login() {
+function Register() {
   const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -12,31 +16,32 @@ function Login() {
   const [fadeIn, setFadeIn] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  React.useEffect(() => {
     setFadeIn(true);
-    // Auto-login if session token exists
-    const token = localStorage.getItem("sessionToken");
-    const user = localStorage.getItem("user");
-    if (token && user) {
-      navigate("/home");
-    }
-  }, [navigate]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
-      const res = await axios.post("http://localhost:5000/api/login", {
+      await axios.post("http://localhost:5000/api/register", {
         username,
+        full_name: fullName,
+        email,
         password
       });
 
-      setError("");
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      localStorage.setItem("sessionToken", res.data.sessionToken);
-      navigate("/home");
+      toast.success("Successfully registered! Redirecting to login...", {
+        position: "top-center",
+        autoClose: 2000,
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed");
+      setError(err.response?.data?.error || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -54,15 +59,16 @@ function Login() {
             opacity: fadeIn ? 1 : 0,
             transform: fadeIn ? "translateX(0px)" : "translateX(40px)",
             transition: "opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1)"
-          }}>
+            }}>
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-6 leading-tight">
-          Sign up, start finding, <br />spread good vibes.
+          Join CampusFind, <br />connect and help your community.
         </h1>
         <p className="text-lg md:text-xl text-white max-w-lg">
-          AI-powered lost and found for School Campuses — connecting communities, reuniting people with what matters.
+          Register to start finding and claiming lost items, and earn rewards for helping others!
         </p>
       </div>
-      {/* Right Side: Login Form */}
+
+      {/* Right Side: Register Form */}
       <div className="flex flex-1 items-center justify-center">
         <div
           className="w-full max-w-sm bg-white/90 dark:bg-[#161b22]/90 border border-gray-200 dark:border-[#30363d] rounded-lg shadow-lg p-8 backdrop-blur"
@@ -72,11 +78,11 @@ function Login() {
             transition: "opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1)"
           }}
         >
-          <h2 className="text-center text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Sign in to CampusFind</h2>
+          <h2 className="text-center text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Create your account</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="username">
-                Username or email address
+                Username
               </label>
               <input
                 id="username"
@@ -91,12 +97,41 @@ function Login() {
               />
             </div>
             <div className="mb-4">
-              <div className="flex justify-between items-center">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="password">
-                  Password
-                </label>
-                <a href="#" className="text-xs text-blue-600 hover:underline dark:text-blue-400">Forgot password?</a>
-              </div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="fullName">
+                Full Name
+              </label>
+              <input
+                id="fullName"
+                type="text"
+                placeholder="Full Name"
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-[#30363d] rounded bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+                autoComplete="name"
+                disabled={loading}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="email">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-[#30363d] rounded bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+                autoComplete="email"
+                disabled={loading}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="password">
+                Password
+              </label>
               <div style={{ position: "relative" }}>
                 <input
                   id="password"
@@ -106,7 +141,7 @@ function Login() {
                   onChange={e => setPassword(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-[#30363d] rounded bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   disabled={loading}
                   style={{ paddingRight: "40px" }}
                 />
@@ -135,7 +170,7 @@ function Login() {
             {error && <div className="text-red-600 dark:text-red-400 text-sm mb-4">{error}</div>}
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded transition-colors flex items-center justify-center"
+              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition-colors flex items-center justify-center"
               disabled={loading}
             >
               {loading ? (
@@ -156,20 +191,23 @@ function Login() {
                       </g>
                     </g>
                   </svg>
-                  Logging in...
+                  Creating account...
                 </span>
               ) : (
-                "Sign in"
+                "Register"
               )}
             </button>
           </form>
           <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-            Don't Have an account? <a href="/register" className="text-blue-600 hover:underline dark:text-blue-400">Create an account</a>
+            Already have an account? <a href="/login" className="text-blue-600 hover:underline dark:text-blue-400">Sign in</a>
           </div>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   );
 }
 
-export default Login;
+export default Register;
