@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import pkg from "pg";
+import serverless from "serverless-http";
 
 dotenv.config();
 const { Pool } = pkg;
@@ -71,4 +72,4 @@ app.post("/api/register", async(req, res) => {
 });
 
 // Export for Vercel
-export default app;
+export const handler = serverless(app);

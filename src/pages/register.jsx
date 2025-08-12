@@ -14,7 +14,6 @@ function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
-  const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -26,7 +25,7 @@ function Register() {
     setLoading(true);
     setError("");
     try {
-      await axios.post(`${API_URL}api/register`, {
+      await axios.post("/api/register", {
         username,
         full_name: fullName,
         email,
