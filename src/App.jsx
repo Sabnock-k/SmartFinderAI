@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './pages/login.jsx';
+import Login from './pages/Login.jsx';
 import OwnerPage from './pages/owner_page.jsx';
 import Register from './pages/register.jsx';
 
