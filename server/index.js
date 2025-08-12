@@ -11,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 const pool = new Pool({
+    // eslint-disable-next-line no-undef
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });

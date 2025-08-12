@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import Navbar from '../components/navbar.jsx';
-import { useNavigate } from "react-router-dom";
+
 
 const OwnerPage = () => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const avatarRef = useRef(null);
 
