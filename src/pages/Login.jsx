@@ -10,6 +10,7 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
+  const API_BASE = import.meta.env.VITE_API_BASE;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,7 +27,7 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("/server/login", {
+      const res = await axios.post(`${API_BASE}/login`, {
         username,
         password
       });
