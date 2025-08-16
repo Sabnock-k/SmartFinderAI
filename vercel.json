@@ -1,7 +1,5 @@
 {
-    "version": 2,
-    "routes": [
-        { "src": "/login", "dest": "/api/server.js" },
-        { "src": "/register", "dest": "/api/server.js" }
+    "rewrites": [
+        { "source": "/(.*)", "destination": "/index.html" }
     ]
 }
