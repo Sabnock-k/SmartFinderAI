@@ -1,9 +1,9 @@
-import serverless from "serverless-http";
+import bcrypt from "bcrypt";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import pkg from "pg";
-import bcrypt from "bcrypt";
+import serverless from "serverless-http";
 
 dotenv.config();
 const { Pool } = pkg;
@@ -13,12 +13,11 @@ app.use(cors());
 app.use(express.json());
 
 const pool = new Pool({
-    // eslint-disable-next-line no-undef
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
 });
 
-// POST /login
+// Login endpoint
 app.post("/login", async(req, res) => {
     const { username, password } = req.body;
     try {
@@ -44,16 +43,18 @@ app.post("/login", async(req, res) => {
     }
 });
 
-// POST /register
+// Register endpoint
 app.post("/register", async(req, res) => {
     const { username, full_name, email, password } = req.body;
     if (!username || !full_name || !email || !password) {
         return res.status(400).json({ error: "All fields are required" });
     }
+
     try {
         const exists = await pool.query(
             `SELECT * FROM users WHERE username = $1 OR email = $2 LIMIT 1`, [username, email]
         );
+
         if (exists.rows.length > 0) {
             return res.status(409).json({ error: "Username or email already exists" });
         }
@@ -71,11 +72,5 @@ app.post("/register", async(req, res) => {
     }
 });
 
-// Local server
-// eslint-disable-next-line no-undef
-if (process.env.NODE_ENV !== "production") {
-    app.listen(5000, () => console.log("Server running locally on port 5000"));
-}
-
-// Serverless export for Vercel
+// Export for serverless
 export const handler = serverless(app);
