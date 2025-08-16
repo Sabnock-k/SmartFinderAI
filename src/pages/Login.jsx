@@ -10,7 +10,7 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
-  const API_BASE = import.meta.env.VITE_API_BASE;
+  const API_BASE = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
   useEffect(() => {
