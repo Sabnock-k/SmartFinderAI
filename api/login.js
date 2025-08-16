@@ -6,6 +6,7 @@ dotenv.config();
 const { Pool } = pkg;
 
 const pool = new Pool({
+    // eslint-disable-next-line no-undef
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
 });
