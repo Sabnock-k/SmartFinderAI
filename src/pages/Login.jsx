@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import '../index.css';
 
+const API_BASE = import.meta.env.VITE_API_BASE || "";
+
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +28,7 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("/login", {
+      const res = await axios.post(`${API_BASE}/api/login`, {
         username,
         password
       });

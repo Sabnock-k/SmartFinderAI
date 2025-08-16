@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../index.css";
-
+const API_BASE = import.meta.env.VITE_API_BASE || "";
 function Register() {
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
@@ -25,7 +25,7 @@ function Register() {
     setLoading(true);
     setError("");
     try {
-      await axios.post("/register", {
+      await axios.post(`${API_BASE}/api/register`, {
         username,
         full_name: fullName,
         email,
