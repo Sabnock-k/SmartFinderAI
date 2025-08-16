@@ -18,7 +18,7 @@ const pool = new Pool({
 });
 
 // Login endpoint
-app.post("/api/login", async(req, res) => {
+app.post("/server/login", async(req, res) => {
     const { username, password } = req.body;
     try {
         const result = await pool.query(
@@ -44,7 +44,7 @@ app.post("/api/login", async(req, res) => {
 });
 
 // Register endpoint
-app.post("/api/register", async(req, res) => {
+app.post("/server/register", async(req, res) => {
     const { username, full_name, email, password } = req.body;
     if (!username || !full_name || !email || !password) {
         return res.status(400).json({ error: "All fields are required" });
