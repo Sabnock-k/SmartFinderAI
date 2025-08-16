@@ -15,6 +15,7 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
   const navigate = useNavigate();
+  
 
   React.useEffect(() => {
     setFadeIn(true);
@@ -25,7 +26,7 @@ function Register() {
     setLoading(true);
     setError("");
     try {
-      await axios.post("/server/register", {
+      await axios.post("/register", {
         username,
         full_name: fullName,
         email,

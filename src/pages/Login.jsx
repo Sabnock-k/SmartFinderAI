@@ -10,8 +10,9 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     setFadeIn(true);
     // Auto-login if session token exists
@@ -26,7 +27,7 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("/server/login", {
+      const res = await axios.post(`${API_URL}/login`, {
         username,
         password
       });
