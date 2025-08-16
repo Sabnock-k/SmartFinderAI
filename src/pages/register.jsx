@@ -25,7 +25,7 @@ function Register() {
     setLoading(true);
     setError("");
     try {
-      await axios.post("/api/register", {
+      await axios.post("/server/register", {
         username,
         full_name: fullName,
         email,

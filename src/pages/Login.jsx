@@ -26,7 +26,7 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("/api/login", {
+      const res = await axios.post("/server/login", {
         username,
         password
       });
