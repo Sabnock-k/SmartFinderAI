@@ -22,7 +22,7 @@ app.post("/api/login", async(req, res) => {
     const { username, password } = req.body;
     try {
         const result = await pool.query(
-            `SELECT * FROM users WHERE username = $1 OR email = $1 LIMIT 1`, [username]
+            `SELECT * FROM users WHERE LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($1) LIMIT 1`, [username]
         );
 
         if (result.rows.length === 0) {
