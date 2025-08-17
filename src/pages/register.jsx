@@ -32,9 +32,9 @@ function Register() {
         password
       });
 
-      toast.success("Password succesfully reset! Redirecting to login...", {
+      toast.success("Successfully registered! Redirecting to login...", {
         position: "top-center",
-        autoClose: 4000,
+        autoClose: 5000,
       });
 
       setTimeout(() => {

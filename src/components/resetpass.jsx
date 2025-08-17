@@ -77,7 +77,7 @@ function ResetPassword() {
       setIsSuccess(true);
       
       // Auto redirect to login after 3 seconds
-      toast.success("Successfully registered! Redirecting to login...", {
+      toast.success("Password succesfully reset! Redirecting to login...", {
             position: "top-center",
             autoClose: 4000,
         });
