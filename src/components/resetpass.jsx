@@ -1,6 +1,8 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import '../index.css';
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -75,6 +77,11 @@ function ResetPassword() {
       setIsSuccess(true);
       
       // Auto redirect to login after 3 seconds
+      toast.success("Successfully registered! Redirecting to login...", {
+            position: "top-center",
+            autoClose: 3000,
+        });
+
       setTimeout(() => {
         navigate("/login");
       }, 3000);
@@ -271,6 +278,8 @@ function ResetPassword() {
               </button>
             </div>
           )}
+
+          <ToastContainer />
           
           {!isSuccess && (
             <button
