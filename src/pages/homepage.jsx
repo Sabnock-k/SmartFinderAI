@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Navbar from '../components/navbar.jsx';
 
 
-const OwnerPage = () => {
+const Homepage = () => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -75,4 +75,4 @@ const OwnerPage = () => {
   );
 };
 
-export default OwnerPage;
+export default Homepage;
