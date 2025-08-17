@@ -1,8 +1,15 @@
 import express from "express";
+import cors from "cors";
 import loginHandler from "./login.js";
 import registerHandler from "./register.js";
 
 const app = express();
+
+app.use(cors({
+    origin: "http://localhost:5173", // allow your frontend URL
+    methods: ["GET", "POST"], // allowed HTTP methods
+    credentials: true // if you use cookies/auth
+}));
 
 app.use(express.json());
 
