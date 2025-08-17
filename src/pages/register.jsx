@@ -34,12 +34,12 @@ function Register() {
 
       toast.success("Password succesfully reset! Redirecting to login...", {
         position: "top-center",
-        autoClose: 2000,
+        autoClose: 4000,
       });
 
       setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 5000);
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed");
     } finally {

@@ -79,12 +79,12 @@ function ResetPassword() {
       // Auto redirect to login after 3 seconds
       toast.success("Successfully registered! Redirecting to login...", {
             position: "top-center",
-            autoClose: 3000,
+            autoClose: 4000,
         });
 
       setTimeout(() => {
         navigate("/login");
-      }, 3000);
+      }, 5000);
 
     } catch (err) {
       const errorMessage = err.response?.data?.error || "Something went wrong. Please try again.";
@@ -168,6 +168,7 @@ function ResetPassword() {
       </div>
       
       {/* Right Side: Reset Password Form */}
+      <ToastContainer />
       <div className="flex flex-1 items-center justify-center">
         <div
           className="w-full max-w-sm bg-[#161b22]/90 border border-[#30363d] rounded-lg shadow-lg p-8 backdrop-blur"
@@ -279,8 +280,6 @@ function ResetPassword() {
             </div>
           )}
 
-          <ToastContainer />
-          
           {!isSuccess && (
             <button
               onClick={handleBackToLogin}
