@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import loginHandler from "./login.js";
 import registerHandler from "./register.js";
-import recoverHandler from './recover.js';
+import forgotPasswordHandler from './forgot-password.js'; // Assuming you handle password reset here
 
 const app = express();
 
@@ -16,7 +16,6 @@ app.use(express.json());
 
 app.post("/api/login", loginHandler);
 app.post("/api/register", registerHandler);
-app.post('/api/recover', recoverHandler);
-app.put('/api/recover', recoverHandler);
+app.post('/api/forgot-password', forgotPasswordHandler);
 
 app.listen(5000, () => console.log("Server running on port 5000"));
