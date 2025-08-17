@@ -97,7 +97,7 @@ function Login() {
                 <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="password">
                   Password
                 </label>
-                <a href="/recover" className="text-xs text-blue-600 hover:underline">Forgot password?</a>
+                <a href="/forgot-password" className="text-xs text-blue-600 hover:underline">Forgot password?</a>
               </div>
               <div style={{ position: "relative" }}>
                 <input

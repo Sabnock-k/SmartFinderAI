@@ -31,7 +31,7 @@ function ForgotPassword() {
     setMessage("");
 
     try {
-      const res = await axios.post(`${API_BASE}/api/recover`, {
+      const res = await axios.post(`${API_BASE}/api/forgot-password`, {
         email
       });
 
@@ -55,7 +55,7 @@ function ForgotPassword() {
     setError("");
     
     try {
-      await axios.post(`${API_BASE}/api/recover`, {
+      await axios.post(`${API_BASE}/api/forgot-password`, {
         email
       });
       setMessage("Reset link sent again. Please check your email.");
