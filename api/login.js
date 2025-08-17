@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import pkg from "pg";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 const { Pool } = pkg;
@@ -34,7 +35,13 @@ export default async function handler(req, res) {
             return res.status(401).json({ error: "Invalid username or password" });
         }
 
-        res.status(200).json({ user });
+        const token = jwt.sign({ id: user.id, username: user.username },
+            // eslint-disable-next-line no-undef
+            process.env.JWT_SECRET, // Add JWT_SECRET in your .env
+            { expiresIn: "2h" } // token valid for 1 hour
+        );
+
+        res.status(200).json({ user, sessionToken: token });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Database error" });
