@@ -40,10 +40,10 @@ const Homepage = () => {
         <Navbar user={user} />
         {/* Page Content (center column with frosted card) */}
         <div className="flex flex-col justify-center px-6">
-          <h1 className="text-center text-4xl md:text-5xl font-extrabold text-gray-100 mb-6 leading-tight">
+          <h1 className="text-center text-4xl md:text-5xl font-extrabold text-[#ECEEDF] mb-6 leading-tight">
             Dont't panic, <br />CampusFinder's on it.
           </h1>
-          <p className="text-center text-lg md:text-xl text-white max-w-lg mx-auto">
+          <p className="text-center text-lg md:text-xl text-[#ECEEDF] max-w-lg mx-auto">
             AI-powered lost and found for School Campuses — connecting communities, reuniting people with what matters.
           </p>
         </div>
