@@ -66,7 +66,7 @@ function ResetPassword() {
     setMessage("");
 
     try {
-      const res = await axios.put(`${API_BASE}/api/recover`, {
+      const res = await axios.put(`${API_BASE}/api/reset-password`, {
         token,
         newPassword: password
       });
