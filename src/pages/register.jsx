@@ -60,7 +60,7 @@ function Register() {
             transform: fadeIn ? "translateX(0px)" : "translateX(40px)",
             transition: "opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1)"
             }}>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-6 leading-tight">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-100 mb-6 leading-tight">
           Join CampusFind, <br />connect and help your community.
         </h1>
         <p className="text-lg md:text-xl text-white max-w-lg">
@@ -71,17 +71,17 @@ function Register() {
       {/* Right Side: Register Form */}
       <div className="flex flex-1 items-center justify-center">
         <div
-          className="w-full max-w-sm bg-white/90 dark:bg-[#161b22]/90 border border-gray-200 dark:border-[#30363d] rounded-lg shadow-lg p-8 backdrop-blur"
+          className="w-full max-w-sm bg-[#161b22]/90 border border-[#30363d] rounded-lg shadow-lg p-8 backdrop-blur"
           style={{
             opacity: fadeIn ? 1 : 0,
             transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
             transition: "opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1)"
           }}
         >
-          <h2 className="text-center text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Create your account</h2>
+          <h2 className="text-center text-2xl font-bold mb-6 text-gray-100">Create your account</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="username">
+              <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="username">
                 Username
               </label>
               <input
@@ -90,14 +90,14 @@ function Register() {
                 placeholder="Username"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-[#30363d] rounded bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-[#30363d] rounded bg-[#0d1117] text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
                 autoComplete="username"
                 disabled={loading}
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="fullName">
+              <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="fullName">
                 Full Name
               </label>
               <input
@@ -106,14 +106,14 @@ function Register() {
                 placeholder="Full Name"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-[#30363d] rounded bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-[#30363d] rounded bg-[#0d1117] text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
                 autoComplete="name"
                 disabled={loading}
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="email">
+              <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="email">
                 Email
               </label>
               <input
@@ -122,14 +122,14 @@ function Register() {
                 placeholder="Email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-[#30363d] rounded bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-[#30363d] rounded bg-[#0d1117] text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
                 autoComplete="email"
                 disabled={loading}
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="password">
+              <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="password">
                 Password
               </label>
               <div style={{ position: "relative" }}>
@@ -139,7 +139,7 @@ function Register() {
                   placeholder="Password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-[#30363d] rounded bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-[#30363d] rounded bg-[#0d1117] text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                   autoComplete="new-password"
                   disabled={loading}
@@ -167,7 +167,7 @@ function Register() {
                 </button>
               </div>
             </div>
-            {error && <div className="text-red-600 dark:text-red-400 text-sm mb-4">{error}</div>}
+            {error && <div className="text-red-400 text-sm mb-4">{error}</div>}
             <button
               type="submit"
               className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition-colors flex items-center justify-center"
@@ -198,8 +198,8 @@ function Register() {
               )}
             </button>
           </form>
-          <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account? <a href="/login" className="text-blue-600 hover:underline dark:text-blue-400">Sign in</a>
+          <div className="mt-6 text-center text-sm text-gray-400">
+            Already have an account? <a href="/login" className="text-blue-600 hover:underline">Sign in</a>
           </div>
         </div>
       </div>

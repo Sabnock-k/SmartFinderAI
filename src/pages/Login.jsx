@@ -57,7 +57,7 @@ function Login() {
             transform: fadeIn ? "translateX(0px)" : "translateX(40px)",
             transition: "opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1)"
           }}>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-6 leading-tight">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-100 mb-6 leading-tight">
           Sign up, start finding, <br />spread good vibes.
         </h1>
         <p className="text-lg md:text-xl text-white max-w-lg">
@@ -67,17 +67,17 @@ function Login() {
       {/* Right Side: Login Form */}
       <div className="flex flex-1 items-center justify-center">
         <div
-          className="w-full max-w-sm bg-white/90 dark:bg-[#161b22]/90 border border-gray-200 dark:border-[#30363d] rounded-lg shadow-lg p-8 backdrop-blur"
+          className="w-full max-w-sm bg-[#161b22]/90 border border-[#30363d] rounded-lg shadow-lg p-8 backdrop-blur"
           style={{
             opacity: fadeIn ? 1 : 0,
             transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
             transition: "opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1)"
           }}
         >
-          <h2 className="text-center text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Sign in to CampusFind</h2>
+          <h2 className="text-center text-2xl font-bold mb-6 text-gray-100">Sign in to CampusFind</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="username">
+              <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="username">
                 Username or email address
               </label>
               <input
@@ -86,7 +86,7 @@ function Login() {
                 placeholder="Username"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-[#30363d] rounded bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-[#30363d] rounded bg-[#0d1117] text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
                 autoComplete="username"
                 disabled={loading}
@@ -94,10 +94,10 @@ function Login() {
             </div>
             <div className="mb-4">
               <div className="flex justify-between items-center">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="password">
+                <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="password">
                   Password
                 </label>
-                <a href="#" className="text-xs text-blue-600 hover:underline dark:text-blue-400">Forgot password?</a>
+                <a href="#" className="text-xs text-blue-600 hover:underline">Forgot password?</a>
               </div>
               <div style={{ position: "relative" }}>
                 <input
@@ -106,7 +106,7 @@ function Login() {
                   placeholder="Password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-[#30363d] rounded bg-gray-50 dark:bg-[#0d1117] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-[#30363d] rounded bg-[#0d1117] text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                   autoComplete="current-password"
                   disabled={loading}
@@ -134,7 +134,7 @@ function Login() {
                 </button>
               </div>
             </div>
-            {error && <div className="text-red-600 dark:text-red-400 text-sm mb-4">{error}</div>}
+            {error && <div className="text-red-400 text-sm mb-4">{error}</div>}
             <button
               type="submit"
               className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded transition-colors flex items-center justify-center"
@@ -165,8 +165,8 @@ function Login() {
               )}
             </button>
           </form>
-          <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-            Don't Have an account? <a href="/register" className="text-blue-600 hover:underline dark:text-blue-400">Create an account</a>
+          <div className="mt-6 text-center text-sm text-gray-400">
+            Don't Have an account? <a href="/register" className="text-blue-600 hover:underline">Create an account</a>
           </div>
         </div>
       </div>
