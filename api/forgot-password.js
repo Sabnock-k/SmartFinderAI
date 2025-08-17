@@ -17,13 +17,22 @@ const pool = new Pool({
 const transporter = nodemailer.createTransport({
     // eslint-disable-next-line no-undef
     host: process.env.EMAIL_SERVICE || "smtp.gmail.com", // or your preferred email service
-    port: 2525,
+    port: 587,
+    secure: false,
     auth: {
         // eslint-disable-next-line no-undef
         user: process.env.EMAIL_USER, // your email
         // eslint-disable-next-line no-undef
         pass: process.env.EMAIL_PASS, // your email password or app password
     },
+});
+
+transporter.verify(function(error, success) {
+    if (error) {
+        console.log('Email transporter verification failed:', error);
+    } else {
+        console.log('Email transporter is ready to send emails');
+    }
 });
 
 export default async function handler(req, res) {
@@ -38,43 +47,61 @@ export default async function handler(req, res) {
 
 // Handle forgot password request
 async function handleForgotPassword(req, res) {
+    console.log('🔍 handleForgotPassword called');
+    console.log('Request method:', req.method);
+    console.log('Request body:', req.body);
+
     const { email } = req.body;
 
     if (!email) {
+        console.log('❌ No email provided');
         return res.status(400).json({ error: "Email is required" });
     }
 
+    console.log('📧 Email received:', email);
+
     try {
+        console.log('🔍 Checking if user exists in database...');
+
         // Check if user exists
         const result = await pool.query(
             `SELECT user_id, email, username, full_name FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1`, [email]
         );
 
+        console.log('📊 Database query result:', result.rows.length, 'rows found');
+
         // Always return success message for security (don't reveal if email exists)
         if (result.rows.length === 0) {
+            console.log('❌ No user found with email:', email);
             return res.status(200).json({
                 message: "If an account with that email exists, we've sent you a password reset link."
             });
         }
 
         const user = result.rows[0];
+        console.log('✅ User found:', user.username, user.email);
 
         // Generate reset token (valid for 1 hour)
+        console.log('🔑 Generating reset token...');
         const resetToken = jwt.sign({ userId: user.user_id, email: user.email, type: "password-reset" },
-            // eslint-disable-next-line no-undef
             process.env.JWT_SECRET, { expiresIn: "1h" }
         );
+        console.log('✅ Reset token generated');
 
         // Store reset token in database (PostgreSQL interval syntax)
+        console.log('💾 Storing reset token in database...');
         await pool.query(
             `UPDATE users SET reset_token = $1, reset_token_expires = NOW() + INTERVAL '1 hour' WHERE user_id = $2`, [resetToken, user.user_id]
         );
+        console.log('✅ Reset token stored in database');
 
         // Send reset email
-        const resetUrl = `${process.env.VITE_API_URL || 'http://localhost:5000'}/recover?token=${resetToken}`;
+        console.log('🌐 Creating reset URL...');
+        const resetUrl = `${process.env.VITE_API_URL || 'http://localhost:5173'}/recover?token=${resetToken}`;
+        console.log('Reset URL:', resetUrl);
 
+        console.log('📧 Preparing email...');
         const mailOptions = {
-            // eslint-disable-next-line no-undef
             from: process.env.EMAIL_USER,
             to: user.email,
             subject: "CampusFind - Password Reset Request",
@@ -102,14 +129,23 @@ async function handleForgotPassword(req, res) {
             `,
         };
 
-        await transporter.sendMail(mailOptions);
+        console.log('📧 Attempting to send email...');
+        console.log('From:', process.env.EMAIL_USER);
+        console.log('To:', user.email);
+
+        const info = await transporter.sendMail(mailOptions);
+
+        console.log('✅ Email sent successfully!');
+        console.log('Message ID:', info.messageId);
+        console.log('Response:', info.response);
 
         res.status(200).json({
             message: "If an account with that email exists, we've sent you a password reset link."
         });
 
     } catch (err) {
-        console.error("Forgot password error:", err);
+        console.error('❌ Error in handleForgotPassword:', err);
+        console.error('Error stack:', err.stack);
         res.status(500).json({ error: "Server error. Please try again later." });
     }
 }
