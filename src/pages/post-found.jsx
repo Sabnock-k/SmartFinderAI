@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar.jsx";
-import { X, Upload, Camera, MapPin, Calendar, Tag } from "lucide-react";
+import { X, Upload, Camera, MapPin, Calendar, Tag, Loader } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -11,6 +12,7 @@ const PostFound = () => {
   const [token, setToken] = useState(localStorage.getItem("sessionToken"));
   const [loggedIn, setLoggedIn] = useState(!!user && !!token);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -20,42 +22,50 @@ const PostFound = () => {
     category: "",
     location_description: "",
     date_time_found: "",
-    image: null,
+    image_url: "",
   });
 
+  const categories = [
+    "Electronics", "Clothing", "Accessories", "Books", "Keys",
+    "Bags", "Documents", "Jewelry", "Sports Equipment", "Other"
+  ];
+
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value,
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       await axios.post(`${API_BASE}/api/found-item`, {
-        reported_by_user_id: user.user_id, // taken from logged in user object
+        reported_by_user_id: user.user_id,
         description: formData.description,
         category: formData.category,
         location_description: formData.location_description,
         date_time_found: formData.date_time_found,
-        image_url: formData.image_url, // just a link
+        image_url: formData.image_url,
       });
 
-      alert("Found item uploaded successfully!");
+      toast.success("Found item uploaded successfully! 🎉");
       setIsModalOpen(false);
       setFormData({
         description: "",
         category: "",
         location_description: "",
         date_time_found: "",
-        image: null,
+        image_url: "",
       });
     } catch (err) {
       console.error(err);
-      alert("Error uploading found item.");
+      toast.error("Error uploading found item. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -96,101 +106,157 @@ const PostFound = () => {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal (Copied PostItem Design) */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
-            {/* Close button */}
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
-            >
-              <X size={24} />
-            </button>
-
-            <h2 className="text-2xl font-bold text-[#01096D] mb-4">
-              Upload Found Item
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Description */}
-              <div className="flex items-center border rounded-lg p-2">
-                <Tag className="text-gray-500 mr-2" size={20} />
-                <input
-                  type="text"
-                  name="description"
-                  placeholder="Item description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="w-full outline-none"
-                  required
-                />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  <Upload className="w-6 h-6" />
+                  Report Found Item
+                </h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              {/* Category */}
-              <div className="flex items-center border rounded-lg p-2">
-                <Upload className="text-gray-500 mr-2" size={20} />
-                <input
-                  type="text"
-                  name="category"
-                  placeholder="Category (e.g., Electronics, Clothing)"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full outline-none"
-                />
-              </div>
-
-              {/* Location */}
-              <div className="flex items-center border rounded-lg p-2">
-                <MapPin className="text-gray-500 mr-2" size={20} />
-                <input
-                  type="text"
-                  name="location_description"
-                  placeholder="Where did you find it?"
-                  value={formData.location_description}
-                  onChange={handleChange}
-                  className="w-full outline-none"
-                />
-              </div>
-
-              {/* Date */}
-              <div className="flex items-center border rounded-lg p-2">
-                <Calendar className="text-gray-500 mr-2" size={20} />
-                <input
-                  type="datetime-local"
-                  name="date_time_found"
-                  value={formData.date_time_found}
-                  onChange={handleChange}
-                  className="w-full outline-none"
-                  required
-                />
-              </div>
-
-              {/* Image URL */}
-                <div className="flex items-center border rounded-lg p-2">
-                <Camera className="text-gray-500 mr-2" size={20} />
-                <input
-                    type="url"
-                    name="image_url"
-                    placeholder="Paste image link (e.g. from Cloudinary)"
-                    value={formData.image_url || ""}
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description *
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
                     onChange={handleChange}
-                    className="w-full outline-none"
-                />
+                    placeholder="Describe the item you found..."
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    rows="3"
+                    required
+                  />
                 </div>
 
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <Tag className="w-4 h-4 inline mr-1" />
+                    Category
+                  </label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
 
-              {/* Submit */}
-              <button
-                type="submit"
-                className="w-full bg-[#01096D] text-white py-2 rounded-lg font-bold hover:bg-[#020B99] transition"
-              >
-                Submit Item
-              </button>
-            </form>
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <MapPin className="w-4 h-4 inline mr-1" />
+                    Location Found *
+                  </label>
+                  <input
+                    type="text"
+                    name="location_description"
+                    value={formData.location_description}
+                    onChange={handleChange}
+                    placeholder="e.g., Library 2nd floor, near the entrance"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+
+                {/* Date and Time Found */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <Calendar className="w-4 h-4 inline mr-1" />
+                    Date & Time Found *
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="date_time_found"
+                    value={formData.date_time_found}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+
+                {/* Image URL */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <Camera className="w-4 h-4 inline mr-1" />
+                    Image URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    name="image_url"
+                    value={formData.image_url}
+                    onChange={handleChange}
+                    placeholder="https://example.com/image.jpg"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader className="animate-spin mr-2 w-4 h-4" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        Submit Item
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };
