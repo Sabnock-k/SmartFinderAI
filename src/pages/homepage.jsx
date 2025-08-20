@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from '../components/navbar.jsx';
 
 const Homepage = () => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
