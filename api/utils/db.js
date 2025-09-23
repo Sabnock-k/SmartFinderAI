@@ -1,6 +1,9 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
+// E change lang ni if mag local dev ka or deploy
+// Set localdev to false if mag deploy naka
+// var localdev = false;
 var localdev = true;
 
 const pool = new Pool({
