@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         );
 
         if (result.rows.length === 0) {
-            return res.status(401).json({ error: "Invalid username or password" });
+            return res.status(401).json({ error: "There is no such user" });
         }
 
         const user = result.rows[0];
