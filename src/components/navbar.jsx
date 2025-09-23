@@ -36,7 +36,7 @@ const Navbar = ({ user }) => {
           Post Found Item
         </button>
         <button
-          onClick={() => navigate("/claim-lost")}
+          onClick={() => navigate("/claim-item")}
           className="px-5 py-2 rounded-full bg-white backdrop-blur-md text-[#01096D] font-bold shadow-md hover:bg-[#dbeafe] transition"
         >
           Claim Lost Item
