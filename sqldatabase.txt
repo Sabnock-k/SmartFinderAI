@@ -1,3 +1,5 @@
+postgresql pass: password
+
 -- Create database
 CREATE DATABASE IF NOT EXISTS campusfinder_ai;
 USE campusfinder_ai;
