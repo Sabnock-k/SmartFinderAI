@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import 'dotenv/config'; 
 // e load sa ang env before sa pool para mo work ang db.js 
 // kay undifined ang process.env.DATABASE_URL without this
+import nodemailer from "nodemailer";
 import pool from "./utils/db.js";
 
 // Email transporter configuration
