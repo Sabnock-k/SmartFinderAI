@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from '../components/navbar.jsx';
 
 const Homepage = () => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
+  const [fadeIn, setFadeIn] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    const storedToken = localStorage.getItem("sessionToken");
-    if (storedUser && storedToken) {
+    if (storedUser) {
       setUser(storedUser);
-      setToken(storedToken);
       setLoggedIn(true);
     }
+    // Trigger fade-in animation
+    setTimeout(() => setFadeIn(true), 100);
   }, []);
 
   if (!loggedIn) {
@@ -29,33 +29,71 @@ const Homepage = () => {
   }
 
   return (
-    // Background image container
-    <div
-      className="min-h-screen bg-fixed bg-center bg-cover"
-      style={{
-        backgroundImage: "url('/background.png')",
-      }}
-    >
-      {/* Overlay to tint + blur the background */}
-      <div className="min-h-screen bg-black/20 backdrop-blur-sm flex flex-col">
-        {/* Navbar always stays at top */}
-        <Navbar user={user} />
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab] relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none z-0">
+        <div className="absolute top-10 left-10 w-32 h-32 border-2 border-white rounded-full"></div>
+        <div className="absolute top-40 right-20 w-20 h-20 border-2 border-white rounded-lg rotate-45"></div>
+        <div className="absolute bottom-20 left-1/4 w-16 h-16 border-2 border-white rounded-full"></div>
+        <div className="absolute bottom-40 right-1/3 w-24 h-24 border-2 border-white rounded-lg rotate-12"></div>
+      </div>
 
-        {/* Centered Content */}
-        <div className="flex flex-col items-center justify-start pt-[8vh]">
-          <h1 className="text-center text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
-            Don't panic, <br />CampusFinder's on it.
+      {/* Navbar */}
+      <div className="z-20">
+        <Navbar user={user} />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex flex-1 items-center justify-center px-4 sm:px-6 z-10">
+        <div
+          className="w-full max-w-3xl bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-8 sm:p-12 border border-white/20"
+          style={{
+            opacity: fadeIn ? 1 : 0,
+            transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
+            transition: "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)"
+          }}
+        >
+          <h1 className="text-center text-4xl md:text-5xl font-extrabold text-[#1a237e] mb-4 leading-tight">
+            Welcome to CampusFinder Lost &amp; Found
           </h1>
-          <p className="text-center text-lg md:text-xl text-white max-w-lg mx-auto">
-            AI-powered lost and found for School Campuses — connecting communities, reuniting people with what matters.
+          <p className="text-center text-lg md:text-xl text-gray-700 max-w-2xl mx-auto mb-8">
+            Your trusted platform for reporting, searching, and recovering lost items on campus. 
+            Powered by AI, we connect our community to reunite people with what matters most.
           </p>
-          <div className="flex justify-center mt-6 pt-10">
-            <button
-              onClick={() => navigate("/post-found")}
-              className="px-5 py-2 rounded-full bg-white text-[#01096D] font-extrabold shadow-md hover:bg-[#dbeafe] transition w-auto"
-            >
-              Post Found Item
-            </button>
+          <div className="flex flex-col md:flex-row gap-6 justify-center mb-8">
+            <div className="flex-1 bg-gray-50 rounded-xl p-6 shadow hover:shadow-lg transition">
+              <h2 className="text-xl font-semibold text-[#283593] mb-2 flex items-center">
+                <span className="mr-2">🔍</span> Search Lost Items
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Browse or search for items reported lost by others. Use filters to quickly find your belongings.
+              </p>
+              <button
+                onClick={() => navigate("/search")}
+                className="px-4 py-2 bg-gradient-to-r from-[#3949ab] to-[#1a237e] text-white rounded-lg font-semibold shadow hover:from-[#283593] hover:to-[#3949ab] transition"
+              >
+                Search Now
+              </button>
+            </div>
+            <div className="flex-1 bg-gray-50 rounded-xl p-6 shadow hover:shadow-lg transition">
+              <h2 className="text-xl font-semibold text-[#388e3c] mb-2 flex items-center">
+                <span className="mr-2">📢</span> Report Found Item
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Found something? Help a fellow student by reporting it. Our AI will match it with lost reports.
+              </p>
+              <button
+                onClick={() => navigate("/post-found")}
+                className="px-4 py-2 bg-gradient-to-r from-[#2e7d32] to-[#388e3c] text-white rounded-lg font-semibold shadow hover:from-[#1b5e20] hover:to-[#2e7d32] transition"
+              >
+                Report Found Item
+              </button>
+            </div>
+          </div>
+          <div className="text-center text-gray-500 text-sm mt-6">
+            <span>
+              Need help? Visit our <a href="/faq" className="text-[#3949ab] underline hover:text-[#1a237e]">FAQ</a> or <a href="/contact" className="text-[#3949ab] underline hover:text-[#1a237e]">Contact Support</a>.
+            </span>
           </div>
         </div>
       </div>
