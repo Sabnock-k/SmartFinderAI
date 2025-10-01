@@ -17,16 +17,21 @@ CREATE TABLE users (
 
 -- Table: found_items
 CREATE TABLE found_items (
-    found_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    reported_by_user_id INT NOT NULL,
+    found_item_id SERIAL PRIMARY KEY, -- auto-increment integer
+    reported_by_user_id INTEGER NOT NULL,
     description TEXT NOT NULL,
     category VARCHAR(100),
     image_url VARCHAR(255),
     location_description VARCHAR(255),
-    date_time_found DATETIME NOT NULL,
-    is_approved BOOLEAN DEFAULT FALSE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (reported_by_user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    date_time_found TIMESTAMP NOT NULL,
+    is_approved BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    embedding VECTOR(768),  -- requires pgvector extension
+
+    -- Foreign key to users table
+    CONSTRAINT fk_reported_by FOREIGN KEY (reported_by_user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
 );
 
 -- Table: claim_requests
