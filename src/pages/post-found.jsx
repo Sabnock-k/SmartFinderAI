@@ -3,7 +3,7 @@ import Navbar from "../components/navbar.jsx";
 import { Upload, Camera, MapPin, Calendar, Tag, Loader, ImagePlus } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
-import { supabase } from "../lib/supabaseClient.js";
+import { supabase } from "../../api/utils/supabaseClient.js";
 
 const API_BASE = "http://localhost:5000";
 
