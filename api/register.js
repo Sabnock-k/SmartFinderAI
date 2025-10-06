@@ -1,7 +1,4 @@
 import bcrypt from "bcrypt";
-import 'dotenv/config'; 
-// e load sa ang env before sa pool para mo work ang db.js 
-// kay undifined ang process.env.DATABASE_URL without this
 import pool from "./utils/db.js";
 
 export default async function handler(req, res) {
