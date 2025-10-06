@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbar.jsx";
-import { Upload, Camera, MapPin, Calendar, Tag, Loader, ImagePlus } from "lucide-react";
+import {
+  Upload,
+  Camera,
+  MapPin,
+  Calendar,
+  Tag,
+  Loader,
+  ImagePlus,
+} from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { supabase } from "../../api/utils/supabaseClient.js";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const PostFound = () => {
   const [user, setUser] = useState(null);
@@ -34,8 +42,16 @@ const PostFound = () => {
   });
 
   const categories = [
-    "Electronics", "Clothing", "Accessories", "Books", "Keys",
-    "Bags", "Documents", "Jewelry", "Sports Equipment", "Other"
+    "Electronics",
+    "Clothing",
+    "Accessories",
+    "Books",
+    "Keys",
+    "Bags",
+    "Documents",
+    "Jewelry",
+    "Sports Equipment",
+    "Other",
   ];
 
   const handleChange = (e) => {
@@ -63,12 +79,14 @@ const PostFound = () => {
 
     // If user selected a file, upload it to Supabase Storage
     if (imageFile) {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+      const fileExt = imageFile.name.split(".").pop();
+      const fileName = `${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}.${fileExt}`;
       const filePath = `found-items/${fileName}`;
 
       const { data, error } = await supabase.storage
-        .from('images') // Replace with your Supabase bucket name
+        .from("images") // Replace with your Supabase bucket name
         .upload(filePath, imageFile, {
           cacheControl: "3600",
           upsert: false,
@@ -84,7 +102,9 @@ const PostFound = () => {
       }
 
       // Get public URL
-      const { data: publicUrlData } = supabase.storage.from("images").getPublicUrl(filePath);
+      const { data: publicUrlData } = supabase.storage
+        .from("images")
+        .getPublicUrl(filePath);
 
       imageUrl = publicUrlData.publicUrl;
     }
@@ -153,15 +173,17 @@ const PostFound = () => {
             Upload lost items. Help reunite owners with their belongings.
           </p>
         </div>
-        
+
         {/* Two-column layout */}
         <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left: Image Upload Card */}
-          <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white/20 flex flex-col items-center"
+          <div
+            className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white/20 flex flex-col items-center"
             style={{
               opacity: fadeIn ? 1 : 0,
               transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
-              transition: "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)"
+              transition:
+                "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)",
             }}
           >
             <label className="block text-sm font-semibold text-blue-900 mb-2 flex items-center gap-1">
@@ -178,7 +200,9 @@ const PostFound = () => {
               ) : (
                 <>
                   <ImagePlus className="w-10 h-10 text-blue-400" />
-                  <span className="text-blue-700 font-medium">Choose Image</span>
+                  <span className="text-blue-700 font-medium">
+                    Choose Image
+                  </span>
                 </>
               )}
               <input
@@ -207,7 +231,8 @@ const PostFound = () => {
             style={{
               opacity: fadeIn ? 1 : 0,
               transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
-              transition: "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)"
+              transition:
+                "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)",
             }}
           >
             {/* Description */}
