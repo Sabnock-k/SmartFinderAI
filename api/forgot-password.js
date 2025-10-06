@@ -1,32 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import 'dotenv/config'; 
-// e load sa ang env before sa pool para mo work ang db.js 
-// kay undifined ang process.env.DATABASE_URL without this
 import nodemailer from "nodemailer";
-import pool from "./utils/db.js";
-
-// Email transporter configuration
-const transporter = nodemailer.createTransport({
-    // eslint-disable-next-line no-undef
-    host: process.env.EMAIL_SERVICE || "smtp.gmail.com", // or your preferred email service
-    port: 587,
-    secure: false,
-    auth: {
-        // eslint-disable-next-line no-undef
-        user: process.env.EMAIL_USER, // your email
-        // eslint-disable-next-line no-undef
-        pass: process.env.EMAIL_PASS, // your email password or app password
-    },
-});
-
-transporter.verify(function(error, success) {
-    if (error) {
-        console.log('Email transporter verification failed:', error);
-    } else {
-        console.log('Email transporter is ready to send emails');
-    }
-});
 
 export default async function handler(req, res) {
     if (req.method === "POST") {
@@ -41,6 +15,21 @@ export default async function handler(req, res) {
 // Handle forgot password request
 async function handleForgotPassword(req, res) {
     console.log('🔍 handleForgotPassword called');
+
+    // Email transporter configuration
+    const transporter = nodemailer.createTransport({
+        // eslint-disable-next-line no-undef
+        host: process.env.EMAIL_SERVICE || "smtp.gmail.com", // or your preferred email service
+        port: 587,
+        secure: false,
+        auth: {
+            // eslint-disable-next-line no-undef
+            user: process.env.EMAIL_USER, // your email
+            // eslint-disable-next-line no-undef
+            pass: process.env.EMAIL_PASS, // your email password or app password
+        },
+    });
+
     console.log('Request method:', req.method);
     console.log('Request body:', req.body);
 
