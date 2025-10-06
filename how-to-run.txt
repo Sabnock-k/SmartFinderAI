@@ -1,0 +1,7 @@
+open terminal
+
+frontend:
+npm run dev
+
+backend:
+node api/server.js
