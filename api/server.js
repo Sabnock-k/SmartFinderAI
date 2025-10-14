@@ -5,6 +5,7 @@ import loginHandler from "./login.js";
 import registerHandler from "./register.js";
 import forgotPasswordHandler from "./forgot-password.js"; // Assuming you handle password reset here
 import uploadFoundItemHandler from "./found-item.js"; // Assuming you handle item uploads here
+import statsHandler from "./stats.js";
 
 const app = express();
 
@@ -23,5 +24,8 @@ app.use("/api/register", registerHandler);
 app.use("/api/forgot-password", forgotPasswordHandler);
 app.use("/api/forgot-password", forgotPasswordHandler);
 app.use("/api/found-item", uploadFoundItemHandler);
+
+// New stats endpoint
+app.use("/api/stats", statsHandler);
 
 app.listen(5000, () => console.log("Server running on port 5000"));
