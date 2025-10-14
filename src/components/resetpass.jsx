@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import AOS from "aos";
+import "aos/dist/aos.css";
 import "react-toastify/dist/ReactToastify.css";
 import "../index.css";
 

@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
+import "aos/dist/aos.css";
 import "../index.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";

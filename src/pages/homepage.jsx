@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from '../components/navbar.jsx';
+import Navbar from "../components/navbar.jsx";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const Homepage = () => {
   const [user, setUser] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [fadeIn, setFadeIn] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,8 +15,10 @@ const Homepage = () => {
       setUser(storedUser);
       setLoggedIn(true);
     }
-    // Trigger fade-in animation
-    setTimeout(() => setFadeIn(true), 100);
+  }, []);
+
+  useEffect(() => {
+    AOS.init({ duration: 800, once: true });
   }, []);
 
   if (!loggedIn) {
@@ -47,18 +50,15 @@ const Homepage = () => {
       <div className="flex flex-1 items-center justify-center px-4 sm:px-6 z-10">
         <div
           className="w-full max-w-3xl bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-8 sm:p-12 border border-white/20"
-          style={{
-            opacity: fadeIn ? 1 : 0,
-            transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
-            transition: "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)"
-          }}
+          data-aos="fade-up"
         >
           <h1 className="text-center text-4xl md:text-5xl font-extrabold text-[#1a237e] mb-4 leading-tight">
             Welcome to CampusFinder Lost &amp; Found
           </h1>
           <p className="text-center text-lg md:text-xl text-gray-700 max-w-2xl mx-auto mb-8">
-            Your trusted platform for reporting, searching, and recovering lost items on campus. 
-            Powered by AI, we connect our community to reunite people with what matters most.
+            Your trusted platform for reporting, searching, and recovering lost
+            items on campus. Powered by AI, we connect our community to reunite
+            people with what matters most.
           </p>
           <div className="flex flex-col md:flex-row gap-6 justify-center mb-8">
             <div className="flex-1 bg-gray-50 rounded-xl p-6 shadow hover:shadow-lg transition">
@@ -66,7 +66,8 @@ const Homepage = () => {
                 <span className="mr-2">🔍</span> Search Lost Items
               </h2>
               <p className="text-gray-600 mb-4">
-                Browse or search for items reported lost by others. Use filters to quickly find your belongings.
+                Browse or search for items reported lost by others. Use filters
+                to quickly find your belongings.
               </p>
               <button
                 onClick={() => navigate("/search")}
@@ -80,7 +81,8 @@ const Homepage = () => {
                 <span className="mr-2">📢</span> Report Found Item
               </h2>
               <p className="text-gray-600 mb-4">
-                Found something? Help a fellow student by reporting it. Our AI will match it with lost reports.
+                Found something? Help a fellow student by reporting it. Our AI
+                will match it with lost reports.
               </p>
               <button
                 onClick={() => navigate("/post-found")}
@@ -92,7 +94,21 @@ const Homepage = () => {
           </div>
           <div className="text-center text-gray-500 text-sm mt-6">
             <span>
-              Need help? Visit our <a href="/faq" className="text-[#3949ab] underline hover:text-[#1a237e]">FAQ</a> or <a href="/contact" className="text-[#3949ab] underline hover:text-[#1a237e]">Contact Support</a>.
+              Need help? Visit our{" "}
+              <a
+                href="/faq"
+                className="text-[#3949ab] underline hover:text-[#1a237e]"
+              >
+                FAQ
+              </a>{" "}
+              or{" "}
+              <a
+                href="/contact"
+                className="text-[#3949ab] underline hover:text-[#1a237e]"
+              >
+                Contact Support
+              </a>
+              .
             </span>
           </div>
         </div>
