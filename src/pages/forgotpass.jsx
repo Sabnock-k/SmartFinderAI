@@ -1,6 +1,7 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
+import AOS from "aos";
 import "../index.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -10,12 +11,10 @@ function ForgotPassword() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [fadeIn, setFadeIn] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setFadeIn(true);
     // Redirect if already logged in
     const token = localStorage.getItem("sessionToken");
     const user = localStorage.getItem("user");
@@ -23,6 +22,10 @@ function ForgotPassword() {
       navigate("/home");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    AOS.init({ duration: 800, once: false });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,12 +93,7 @@ function ForgotPassword() {
       {/* Left Side: Quote */}
       <div
         className="hidden md:flex flex-col justify-center items-start w-full md:w-1/2 px-6 lg:px-20"
-        style={{
-          opacity: fadeIn ? 1 : 0,
-          transform: fadeIn ? "translateX(0px)" : "translateX(40px)",
-          transition:
-            "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)",
-        }}
+        data-aos="fade-left"
       >
         <h1 className="text-2xl lg:text-5xl font-bold text-white mb-4 lg:mb-6 leading-tight">
           Lost your password? <br /> We've got you covered.
@@ -115,12 +113,7 @@ function ForgotPassword() {
       <div className="flex flex-1 items-center justify-center px-4 sm:px-6 py-8">
         <div
           className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-5 sm:p-8 border border-white/20"
-          style={{
-            opacity: fadeIn ? 1 : 0,
-            transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
-            transition:
-              "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)",
-          }}
+          data-aos="fade-right"
         >
           <div className="text-center mb-3">
             <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-[#1a237e] to-[#3949ab] rounded-2xl flex items-center justify-center">
