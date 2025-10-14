@@ -44,14 +44,6 @@ const Homepage = () => {
     fetchStats();
   }, []);
 
-  if (loading) {
-    return (
-      <section className="w-full flex justify-center py-10 text-gray-600">
-        Loading stats...
-      </section>
-    );
-  }
-
   const statData = [
     [
       stats?.reunitedItems ?? 0,
@@ -167,10 +159,16 @@ const Homepage = () => {
             key={i}
             className={`min-w-[170px] px-8 py-6 rounded-2xl shadow-lg text-white ${bg} flex flex-col items-center`}
           >
-            <span className="block text-3xl md:text-4xl font-bold mb-1">
-              {num}
-            </span>
-            <span className="block text-white/90 text-base">{label}</span>
+            {loading ? (
+              <div className="h-10 w-10 border-4 border-white border-t-transparent rounded-full animate-spin mb-2"></div>
+            ) : (
+              <>
+                <span className="block text-3xl md:text-4xl font-bold mb-1">
+                  {num}
+                </span>
+                <span className="block text-white/90 text-base">{label}</span>
+              </>
+            )}
           </div>
         ))}
       </section>
