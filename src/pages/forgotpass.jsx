@@ -111,9 +111,9 @@ function ForgotPassword() {
       </div>
 
       {/* Right Side: Forgot Password Form */}
-      <div className="flex flex-1 items-center justify-center px-4 sm:px-6 py-8">
+      <div className="flex md:flex-1 items-center justify-center px-4 sm:px-6 py-8">
         <div
-          className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-5 sm:p-8 border border-white/20"
+          className="w-full max-w-xs sm:max-w-sm md:max-w-md bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-5 sm:p-8 border border-white/20"
           data-aos="fade-right"
         >
           <div className="text-center mb-3">
@@ -142,7 +142,7 @@ function ForgotPassword() {
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-5">
             {!isSubmitted ? (
               <form onSubmit={handleSubmit}>
                 <div>
@@ -300,13 +300,6 @@ function ForgotPassword() {
                 </button>
               </div>
             )}
-            <button
-              onClick={handleBackToLogin}
-              className="w-full py-3 px-6 bg-transparent hover:bg-gray-200 text-[#3949ab] hover:text-[#1a237e] border-2 border-[#3949ab] font-medium rounded-xl transition-all duration-300 mt-2"
-              disabled={loading}
-            >
-              ← Back to Sign in
-            </button>
           </div>
 
           {/* Footer */}
