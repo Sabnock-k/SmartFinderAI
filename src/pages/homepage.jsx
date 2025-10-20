@@ -5,6 +5,8 @@ import Navbar from "../components/navbar.jsx";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const Homepage = () => {
   const [user, setUser] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -27,7 +29,7 @@ const Homepage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/stats");
+        const res = await axios.get(`${API_BASE}/api/stats`);
         setStats(res.data);
       } catch (err) {
         console.error("Failed to load stats", err);
