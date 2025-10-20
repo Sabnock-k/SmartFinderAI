@@ -1,9 +1,11 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import "react-toastify/dist/ReactToastify.css";
-import '../index.css';
+import "../index.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -13,20 +15,18 @@ function ResetPassword() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [fadeIn, setFadeIn] = useState(false);
   const [tokenValid, setTokenValid] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
-  
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
 
   useEffect(() => {
-    setFadeIn(true);
-    
-    // Check if token exists
     if (!token) {
-      setError("Invalid or missing reset token. Please request a new password reset.");
+      setError(
+        "Invalid or missing reset token. Please request a new password reset."
+      );
       setTokenValid(false);
       return;
     }
@@ -41,6 +41,10 @@ function ResetPassword() {
     setTokenValid(true);
   }, [navigate, token]);
 
+  useEffect(() => {
+    AOS.init({ duration: 800, once: false });
+  }, []);
+
   const validatePassword = (pass) => {
     if (pass.length < 6) {
       return "Password must be at least 6 characters long";
@@ -50,8 +54,7 @@ function ResetPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate passwords
+
     const passwordError = validatePassword(password);
     if (passwordError) {
       setError(passwordError);
@@ -68,30 +71,33 @@ function ResetPassword() {
     setMessage("");
 
     try {
-      const res = await axios.put(`${API_BASE}/api/forgot-password`, {
+      await axios.put(`${API_BASE}/api/forgot-password`, {
         token,
-        newPassword: password
+        newPassword: password,
       });
 
-      setMessage("Password has been reset successfully! You can now log in with your new password.");
+      setMessage(
+        "Password has been reset successfully! You can now log in with your new password."
+      );
       setIsSuccess(true);
-      
-      // Auto redirect to login after 3 seconds
-      toast.success("Password succesfully reset! Redirecting to login...", {
-            position: "top-center",
-            autoClose: 4000,
-        });
+
+      toast.success("Password successfully reset! Redirecting to login...", {
+        position: "top-center",
+        autoClose: 4000,
+      });
 
       setTimeout(() => {
         navigate("/login");
       }, 5000);
-
     } catch (err) {
-      const errorMessage = err.response?.data?.error || "Something went wrong. Please try again.";
+      const errorMessage =
+        err.response?.data?.error || "Something went wrong. Please try again.";
       setError(errorMessage);
-      
-      // If token is expired or invalid, offer to request new reset
-      if (errorMessage.includes("expired") || errorMessage.includes("invalid")) {
+
+      if (
+        errorMessage.includes("expired") ||
+        errorMessage.includes("invalid")
+      ) {
         setTimeout(() => {
           navigate("/forgot-password");
         }, 3000);
@@ -109,88 +115,121 @@ function ResetPassword() {
     navigate("/forgot-password");
   };
 
-  // Show error page if no token
   if (tokenValid === false) {
     return (
-      <div
-        className="min-h-screen bg-fixed bg-center bg-cover flex items-center justify-center"
-        style={{
-          backgroundImage: "url('/background.png')",
-        }}
-      >
-        <div className="w-full max-w-sm bg-[#161b22]/90 border border-[#30363d] rounded-lg shadow-lg p-8 backdrop-blur">
-          <div className="text-center">
-            <svg className="mx-auto h-12 w-12 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-            <h2 className="text-2xl font-bold text-gray-100 mb-4">Invalid Reset Link</h2>
-            <p className="text-gray-300 text-sm mb-6">{error}</p>
-            <button
-              onClick={handleRequestNewReset}
-              className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded transition-colors mb-4"
-            >
-              Request New Reset Link
-            </button>
-            <button
-              onClick={handleBackToLogin}
-              className="w-full py-2 px-4 bg-transparent hover:bg-gray-700 text-gray-300 hover:text-white border border-[#30363d] font-medium rounded transition-colors"
-            >
-              Back to Sign in
-            </button>
-          </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab] px-4">
+        <div className="bg-white/95 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <svg
+            className="mx-auto h-12 w-12 text-red-500 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+          <h2 className="text-2xl font-bold text-[#1a237e] mb-2">
+            Invalid Reset Link
+          </h2>
+          <p className="text-gray-600 text-sm mb-6">{error}</p>
+          <button
+            onClick={handleRequestNewReset}
+            className="w-full py-3 mb-3 bg-gradient-to-r from-[#3949ab] to-[#1a237e] hover:from-[#283593] hover:to-[#3949ab] text-white font-semibold rounded-xl transition-all duration-300"
+          >
+            Request New Reset Link
+          </button>
+          <button
+            onClick={handleBackToLogin}
+            className="w-full py-3 border-2 border-[#3949ab] text-[#3949ab] font-semibold rounded-xl hover:bg-[#3949ab] hover:text-white transition-all duration-300"
+          >
+            Back to Sign in
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className="min-h-screen bg-fixed bg-center bg-cover flex items-stretch"
-      style={{
-        backgroundImage: "url('/background.png')",
-      }}
-    >
-      {/* Left Side: Quote */}
-      <div className="hidden md:flex flex-col justify-center items-start w-1/2 px-16" style={{
-            opacity: fadeIn ? 1 : 0,
-            transform: fadeIn ? "translateX(0px)" : "translateX(40px)",
-            transition: "opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1)"
-          }}>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-100 mb-6 leading-tight">
-          {isSuccess ? "Password Reset!" : "Choose a new password"}
+    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab] relative overflow-hidden">
+      <ToastContainer />
+
+      {/* Background Shapes */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute top-10 left-5 sm:left-10 w-24 sm:w-32 h-24 sm:h-32 border-2 border-white rounded-full"></div>
+        <div className="absolute top-32 sm:top-40 right-10 sm:right-20 w-16 sm:w-20 h-16 sm:h-20 border-2 border-white rounded-lg rotate-45"></div>
+        <div className="absolute bottom-16 sm:bottom-20 left-1/4 w-12 sm:w-16 h-12 sm:h-16 border-2 border-white rounded-full"></div>
+        <div className="absolute bottom-32 sm:bottom-40 right-1/3 w-20 sm:w-24 h-20 sm:h-24 border-2 border-white rounded-lg rotate-12"></div>
+      </div>
+
+      {/* Logo */}
+      <div
+        className="flex flex-col justify-center items-center md:absolute top-3 left-3 cursor-pointer z-10"
+        onClick={() => navigate("/")}
+      >
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className="w-25 sm:w-28 md:w-32 lg:w-36 h-auto drop-shadow-lg"
+        />
+      </div>
+
+      {/* Left Side: Title */}
+      <div
+        className="hidden md:flex flex-col justify-center items-start w-full md:w-1/2 px-6 lg:px-20"
+        data-aos="fade-right"
+      >
+        <h1 className="text-3xl lg:text-5xl font-bold text-white mb-4 lg:mb-6 leading-tight">
+          {isSuccess ? "Password Reset Successful!" : "Choose a New Password"}
         </h1>
-        <p className="text-lg md:text-xl text-white max-w-lg">
-          {isSuccess 
-            ? "Your password has been successfully updated. You can now sign in with your new password." 
-            : "Create a strong password that you'll remember. Make sure it's at least 6 characters long."
-          }
+        <p className="text-base lg:text-xl text-white/90 max-w-lg leading-relaxed">
+          {isSuccess
+            ? "Your password has been successfully updated. You can now log in with your new password."
+            : "Create a strong password that you'll remember. It must be at least 6 characters long."}
         </p>
       </div>
-      
-      {/* Right Side: Reset Password Form */}
-      <ToastContainer />
-      <div className="flex flex-1 items-center justify-center">
+
+      {/* Right Side: Reset Form */}
+      <div className="flex flex-1 items-center justify-center px-4 sm:px-6 py-8">
         <div
-          className="w-full max-w-sm bg-[#161b22]/90 border border-[#30363d] rounded-lg shadow-lg p-8 backdrop-blur"
-          style={{
-            opacity: fadeIn ? 1 : 0,
-            transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
-            transition: "opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1)"
-          }}
+          className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-5 sm:p-8 border border-white/20"
+          data-aos="fade-left"
         >
           {!isSuccess ? (
             <>
-              <h2 className="text-center text-2xl font-bold mb-6 text-gray-100">
-                Reset your password
-              </h2>
-              
-              <p className="text-center text-sm text-gray-300 mb-6">
-                Enter your new password below.
-              </p>
-              
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="password">
+              <div className="text-center mb-6">
+                <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-[#1a237e] to-[#3949ab] rounded-2xl flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 11c0-2.21-1.79-4-4-4S4 8.79 4 11m8 0c0 2.21 1.79 4 4 4s4-1.79 4-4m-8 0v8"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-[#1a237e] mb-2">
+                  Reset your password
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  Enter your new password below.
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-semibold text-[#1a237e] mb-2"
+                  >
                     New Password
                   </label>
                   <input
@@ -198,16 +237,19 @@ function ResetPassword() {
                     type="password"
                     placeholder="Enter new password"
                     value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#30363d] rounded bg-[#0d1117] text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-800 focus:outline-none focus:border-[#3949ab] focus:bg-white transition-all duration-300"
                     required
                     minLength={6}
                     disabled={loading}
                   />
                 </div>
 
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="confirmPassword">
+                <div>
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-sm font-semibold text-[#1a237e] mb-2"
+                  >
                     Confirm Password
                   </label>
                   <input
@@ -215,79 +257,69 @@ function ResetPassword() {
                     type="password"
                     placeholder="Confirm new password"
                     value={confirmPassword}
-                    onChange={e => setConfirmPassword(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#30363d] rounded bg-[#0d1117] text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-800 focus:outline-none focus:border-[#3949ab] focus:bg-white transition-all duration-300"
                     required
                     minLength={6}
                     disabled={loading}
                   />
                 </div>
-                
-                {error && <div className="text-red-400 text-sm mb-4">{error}</div>}
-                {message && <div className="text-green-400 text-sm mb-4">{message}</div>}
-                
+
+                {error && (
+                  <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded text-red-700 text-sm">
+                    {error}
+                  </div>
+                )}
+                {message && (
+                  <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded text-green-700 text-sm">
+                    {message}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded transition-colors flex items-center justify-center mb-4"
+                  className="w-full py-3 px-6 bg-gradient-to-r from-[#2e7d32] to-[#388e3c] hover:from-[#1b5e20] hover:to-[#2e7d32] text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center shadow-lg"
                   disabled={loading}
                 >
-                  {loading ? (
-                    <span style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <svg width="22" height="22" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#fff" style={{ marginRight: "8px" }}>
-                        <g fill="none" fillRule="evenodd">
-                          <g transform="translate(1 1)" strokeWidth="3">
-                            <circle strokeOpacity=".3" cx="18" cy="18" r="18" />
-                            <path d="M36 18c0-9.94-8.06-18-18-18">
-                              <animateTransform
-                                attributeName="transform"
-                                type="rotate"
-                                from="0 18 18"
-                                to="360 18 18"
-                                dur="0.8s"
-                                repeatCount="indefinite" />
-                            </path>
-                          </g>
-                        </g>
-                      </svg>
-                      Resetting password...
-                    </span>
-                  ) : (
-                    "Reset Password"
-                  )}
+                  {loading ? "Resetting..." : "Reset Password"}
                 </button>
               </form>
+
+              <button
+                onClick={handleBackToLogin}
+                className="w-full py-3 px-6 bg-transparent hover:bg-gray-200 text-[#3949ab] hover:text-[#1a237e] border-2 border-[#3949ab] font-medium rounded-xl transition-all duration-300 mt-4"
+              >
+                ← Back to Sign in
+              </button>
             </>
           ) : (
             <div className="text-center">
-              <div className="mb-6">
-                <svg className="mx-auto h-12 w-12 text-green-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              
-              <h2 className="text-2xl font-bold text-gray-100 mb-4">Password Reset Successful!</h2>
-              
-              <p className="text-gray-300 text-sm mb-6">
-                Your password has been successfully updated. You will be redirected to the login page in a few seconds.
+              <svg
+                className="mx-auto h-12 w-12 text-green-500 mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <h2 className="text-2xl font-bold text-[#1a237e] mb-2">
+                Password Reset Successful!
+              </h2>
+              <p className="text-gray-600 text-sm mb-6">
+                You will be redirected to login shortly.
               </p>
-              
               <button
                 onClick={handleBackToLogin}
-                className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded transition-colors"
+                className="w-full py-3 px-6 bg-gradient-to-r from-[#3949ab] to-[#1a237e] hover:from-[#283593] hover:to-[#3949ab] text-white font-semibold rounded-xl transition-all duration-300"
               >
                 Go to Sign in
               </button>
             </div>
-          )}
-
-          {!isSuccess && (
-            <button
-              onClick={handleBackToLogin}
-              className="w-full py-2 px-4 bg-transparent hover:bg-gray-700 text-gray-300 hover:text-white border border-[#30363d] font-medium rounded transition-colors"
-              disabled={loading}
-            >
-              ← Back to Sign in
-            </button>
           )}
         </div>
       </div>

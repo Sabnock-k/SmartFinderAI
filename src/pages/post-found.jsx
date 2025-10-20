@@ -12,6 +12,8 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { supabase } from "../../api/utils/supabaseClient.js";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -19,7 +21,6 @@ const PostFound = () => {
   const [user, setUser] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [fadeIn, setFadeIn] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null); // New state for the image file
 
@@ -29,7 +30,10 @@ const PostFound = () => {
       setUser(storedUser);
       setLoggedIn(true);
     }
-    setTimeout(() => setFadeIn(true), 100);
+  }, []);
+
+  useEffect(() => {
+    AOS.init({ duration: 800, once: true });
   }, []);
 
   // Form state
@@ -179,12 +183,7 @@ const PostFound = () => {
           {/* Left: Image Upload Card */}
           <div
             className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white/20 flex flex-col items-center"
-            style={{
-              opacity: fadeIn ? 1 : 0,
-              transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
-              transition:
-                "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)",
-            }}
+            data-aos="fade-up"
           >
             <label className="block text-sm font-semibold text-blue-900 mb-2 flex items-center gap-1">
               <Camera className="w-4 h-4" />
@@ -228,12 +227,7 @@ const PostFound = () => {
           <form
             onSubmit={handleSubmit}
             className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white/20 flex flex-col justify-between"
-            style={{
-              opacity: fadeIn ? 1 : 0,
-              transform: fadeIn ? "translateY(0px)" : "translateY(40px)",
-              transition:
-                "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)",
-            }}
+            data-aos="fade-up"
           >
             {/* Description */}
             <div className="mb-4">

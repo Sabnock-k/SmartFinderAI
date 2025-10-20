@@ -86,7 +86,7 @@ function Login() {
       </div>
 
       {/* Right Side: Login Form */}
-      <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6">
+      <div className="flex items-center md:flex-1 items-center justify-center px-4 py-8 sm:px-6 py-8">
         <div
           className="w-full max-w-xs sm:max-w-sm md:max-w-md bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-5 sm:p-8 border border-white/20"
           data-aos="zoom-in-up"
