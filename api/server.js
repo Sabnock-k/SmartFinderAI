@@ -3,77 +3,35 @@ import express from "express";
 import cors from "cors";
 import loginHandler from "./login.js";
 import registerHandler from "./register.js";
-import forgotPasswordHandler from "./forgot-password.js";
+import forgotPasswordHandler from "./forgot-password.js"; // Assuming you handle password reset here
 import updateProfileHandler from "./update-profile.js";
 import updatePasswordHandler from "./update-password.js";
-import uploadFoundItemHandler from "./found-item.js";
+import uploadFoundItemHandler from "./found-item.js"; // Assuming you handle item uploads here
 import statsHandler from "./stats.js";
 
 const app = express();
+const isProduction = true; // Change to true when deploying to production
 
 app.use(
   cors({
     origin: process.env.VITE_API_URL || "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"], // allowed HTTP methods
+    credentials: true, // if you use cookies/auth
   })
 );
 
 app.use(express.json());
 
-// Debug endpoint - visit this in your browser
-app.get("/", (req, res) => {
-  res.json({
-    status: "ok",
-    message: "CampusFind API is running",
-    handlers: {
-      loginHandler: typeof loginHandler,
-      registerHandler: typeof registerHandler,
-      forgotPasswordHandler: typeof forgotPasswordHandler,
-      updateProfileHandler: typeof updateProfileHandler,
-      updatePasswordHandler: typeof updatePasswordHandler,
-      uploadFoundItemHandler: typeof uploadFoundItemHandler,
-      statsHandler: typeof statsHandler,
-    },
-  });
-});
+app.use("/login", loginHandler);
+app.use("/register", registerHandler);
+app.use("/forgot-password", forgotPasswordHandler);
+app.use("/update-profile", updateProfileHandler);
+app.use("/update-password", updatePasswordHandler);
+app.use("/found-item", uploadFoundItemHandler);
+app.use("/stats", statsHandler);
 
-// Only mount handlers that are valid functions
-if (loginHandler && typeof loginHandler === "function") {
-  app.use("/login", loginHandler);
+if (!isProduction) {
+  app.listen(5000, () => console.log("Server running on port 5000"));
 }
-
-if (registerHandler && typeof registerHandler === "function") {
-  app.use("/register", registerHandler);
-}
-
-if (forgotPasswordHandler && typeof forgotPasswordHandler === "function") {
-  app.use("/forgot-password", forgotPasswordHandler);
-}
-
-if (updateProfileHandler && typeof updateProfileHandler === "function") {
-  app.use("/update-profile", updateProfileHandler);
-}
-
-if (updatePasswordHandler && typeof updatePasswordHandler === "function") {
-  app.use("/update-password", updatePasswordHandler);
-}
-
-if (uploadFoundItemHandler && typeof uploadFoundItemHandler === "function") {
-  app.use("/found-item", uploadFoundItemHandler);
-}
-
-if (statsHandler && typeof statsHandler === "function") {
-  app.use("/stats", statsHandler);
-}
-
-app.use((err, req, res, next) => {
-  console.error("Error:", err);
-  res.status(500).json({ error: "Internal server error" });
-});
-
-app.use((req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
-
+// Export the Express app for Vercel
 export default app;
