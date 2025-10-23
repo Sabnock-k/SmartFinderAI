@@ -22,13 +22,13 @@ app.use(
 
 app.use(express.json());
 
-app.use("/api/login", loginHandler);
-app.use("/api/register", registerHandler);
-app.use("/api/forgot-password", forgotPasswordHandler);
-app.use("/api/update-profile", updateProfileHandler);
-app.use("/api/update-password", updatePasswordHandler);
-app.use("/api/found-item", uploadFoundItemHandler);
-app.use("/api/stats", statsHandler);
+app.use("/login", loginHandler);
+app.use("/register", registerHandler);
+app.use("/forgot-password", forgotPasswordHandler);
+app.use("/update-profile", updateProfileHandler);
+app.use("/update-password", updatePasswordHandler);
+app.use("/found-item", uploadFoundItemHandler);
+app.use("/stats", statsHandler);
 
 if (!isProduction) {
   app.listen(5000, () => console.log("Server running on port 5000"));
