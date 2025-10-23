@@ -25,7 +25,6 @@ app.use(express.json());
 app.use("/api/login", loginHandler);
 app.use("/api/register", registerHandler);
 app.use("/api/forgot-password", forgotPasswordHandler);
-app.use("/api/forgot-password", forgotPasswordHandler);
 app.use("/api/update-profile", updateProfileHandler);
 app.use("/api/update-password", updatePasswordHandler);
 app.use("/api/found-item", uploadFoundItemHandler);
