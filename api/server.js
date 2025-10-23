@@ -1,13 +1,13 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import loginHandler from "./login.js";
-import registerHandler from "./register.js";
-import forgotPasswordHandler from "./forgot-password.js"; // Assuming you handle password reset here
-import updateProfileHandler from "./update-profile.js";
-import updatePasswordHandler from "./update-password.js";
-import uploadFoundItemHandler from "./found-item.js"; // Assuming you handle item uploads here
-import statsHandler from "./stats.js";
+import loginHandler from "./handlers/login.js";
+import registerHandler from "./handlers/register.js";
+import forgotPasswordHandler from "./handlers/forgot-password.js"; // Assuming you handle password reset here
+import updateProfileHandler from "./handlers/update-profile.js";
+import updatePasswordHandler from "./handlers/update-password.js";
+import uploadFoundItemHandler from "./handlers/found-item.js"; // Assuming you handle item uploads here
+import statsHandler from "./handlers/stats.js";
 
 const app = express();
 const isProduction = true; // Change to true when deploying to production

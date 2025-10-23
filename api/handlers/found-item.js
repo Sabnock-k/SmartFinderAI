@@ -1,5 +1,5 @@
 import express from "express";
-import pool from "./utils/db.js"; // adjust path if needed
+import pool from "../utils/db.js"; // adjust path if needed
 
 const router = express.Router();
 
