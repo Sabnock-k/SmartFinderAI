@@ -10,10 +10,11 @@ import uploadFoundItemHandler from "./found-item.js"; // Assuming you handle ite
 import statsHandler from "./stats.js";
 
 const app = express();
+const isProduction = true; // Change to true when deploying to production
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // allow your frontend URL
+    origin: process.env.VITE_API_URL || "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"], // allowed HTTP methods
     credentials: true, // if you use cookies/auth
   })
@@ -30,4 +31,8 @@ app.use("/api/update-password", updatePasswordHandler);
 app.use("/api/found-item", uploadFoundItemHandler);
 app.use("/api/stats", statsHandler);
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+if (!isProduction) {
+  app.listen(5000, () => console.log("Server running on port 5000"));
+}
+// Export the Express app for Vercel
+export default app;
