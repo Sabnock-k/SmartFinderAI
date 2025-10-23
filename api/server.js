@@ -10,7 +10,6 @@ import uploadFoundItemHandler from "./found-item.js"; // Assuming you handle ite
 import statsHandler from "./stats.js";
 
 const app = express();
-const isProduction = true; // Change to true when deploying to production
 
 app.use(
   cors({
@@ -30,8 +29,5 @@ app.use("/update-password", updatePasswordHandler);
 app.use("/found-item", uploadFoundItemHandler);
 app.use("/stats", statsHandler);
 
-if (!isProduction) {
-  app.listen(5000, () => console.log("Server running on port 5000"));
-}
 // Export the Express app for Vercel
 export default app;
