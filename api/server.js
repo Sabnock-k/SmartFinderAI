@@ -9,31 +9,6 @@ import updatePasswordHandler from "./update-password.js";
 import uploadFoundItemHandler from "./found-item.js";
 import statsHandler from "./stats.js";
 
-// Debug: Check if handlers are loaded correctly
-console.log("loginHandler:", typeof loginHandler, loginHandler);
-console.log("registerHandler:", typeof registerHandler, registerHandler);
-console.log(
-  "forgotPasswordHandler:",
-  typeof forgotPasswordHandler,
-  forgotPasswordHandler
-);
-console.log(
-  "updateProfileHandler:",
-  typeof updateProfileHandler,
-  updateProfileHandler
-);
-console.log(
-  "updatePasswordHandler:",
-  typeof updatePasswordHandler,
-  updatePasswordHandler
-);
-console.log(
-  "uploadFoundItemHandler:",
-  typeof uploadFoundItemHandler,
-  uploadFoundItemHandler
-);
-console.log("statsHandler:", typeof statsHandler, statsHandler);
-
 const app = express();
 
 app.use(
@@ -46,51 +21,50 @@ app.use(
 
 app.use(express.json());
 
+// Debug endpoint - visit this in your browser
 app.get("/", (req, res) => {
-  res.json({ status: "ok", message: "CampusFind API is running" });
+  res.json({
+    status: "ok",
+    message: "CampusFind API is running",
+    handlers: {
+      loginHandler: typeof loginHandler,
+      registerHandler: typeof registerHandler,
+      forgotPasswordHandler: typeof forgotPasswordHandler,
+      updateProfileHandler: typeof updateProfileHandler,
+      updatePasswordHandler: typeof updatePasswordHandler,
+      uploadFoundItemHandler: typeof uploadFoundItemHandler,
+      statsHandler: typeof statsHandler,
+    },
+  });
 });
 
-// Conditionally mount only valid handlers
+// Only mount handlers that are valid functions
 if (loginHandler && typeof loginHandler === "function") {
   app.use("/login", loginHandler);
-} else {
-  console.error("loginHandler is invalid!");
 }
 
 if (registerHandler && typeof registerHandler === "function") {
   app.use("/register", registerHandler);
-} else {
-  console.error("registerHandler is invalid!");
 }
 
 if (forgotPasswordHandler && typeof forgotPasswordHandler === "function") {
   app.use("/forgot-password", forgotPasswordHandler);
-} else {
-  console.error("forgotPasswordHandler is invalid!");
 }
 
 if (updateProfileHandler && typeof updateProfileHandler === "function") {
   app.use("/update-profile", updateProfileHandler);
-} else {
-  console.error("updateProfileHandler is invalid!");
 }
 
 if (updatePasswordHandler && typeof updatePasswordHandler === "function") {
   app.use("/update-password", updatePasswordHandler);
-} else {
-  console.error("updatePasswordHandler is invalid!");
 }
 
 if (uploadFoundItemHandler && typeof uploadFoundItemHandler === "function") {
   app.use("/found-item", uploadFoundItemHandler);
-} else {
-  console.error("uploadFoundItemHandler is invalid!");
 }
 
 if (statsHandler && typeof statsHandler === "function") {
   app.use("/stats", statsHandler);
-} else {
-  console.error("statsHandler is invalid!");
 }
 
 app.use((err, req, res, next) => {
