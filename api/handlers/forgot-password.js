@@ -2,7 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import pool from "./utils/db.js"; // adjust the path if needed
+import pool from "../utils/db.js"; // adjust the path if needed
 
 const router = express.Router();
 
