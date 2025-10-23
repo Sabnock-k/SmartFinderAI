@@ -17,11 +17,6 @@ const pool = new Pool({
   ssl: isProduction
     ? { rejectUnauthorized: false } // Neon / production
     : false, // local dev
-
-  max: 1, // Limit connections for serverless (each function gets 1)
-  idleTimeoutMillis: 0, // Close idle connections immediately
-  connectionTimeoutMillis: 10000, // 10 second timeout
-  allowExitOnIdle: true, // Allow Node.js to exit if idle
 });
 
 export default pool;
