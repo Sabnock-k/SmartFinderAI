@@ -19,6 +19,12 @@ const Homepage = () => {
     if (storedUser) {
       setUser(storedUser);
       setLoggedIn(true);
+
+      // Check if user is admin
+      if (storedUser.is_admin === true) {
+        setLoggedIn(false);
+        navigate("/admin");
+      }
     }
   }, []);
 
