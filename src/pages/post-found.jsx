@@ -123,7 +123,10 @@ const PostFound = () => {
         image_url: imageUrl,
       });
 
-      toast.success("Found item uploaded successfully! 🎉");
+      toast.success("Found item uploaded successfully! 🎉", {
+        position: "top-center",
+        autoClose: 3000,
+      });
       setFormData({
         description: "",
         category: "",
@@ -135,7 +138,10 @@ const PostFound = () => {
       setImageFile(null);
     } catch (err) {
       console.error(err);
-      toast.error("Error uploading found item. Please try again.");
+      toast.error("Error uploading found item. Please try again.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -165,6 +171,9 @@ const PostFound = () => {
       <div className="z-20">
         <Navbar user={user} />
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer />
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col items-center justify-center px-4 sm:px-6 sm:-translate-y-[50px] z-10 w-full">
@@ -316,20 +325,6 @@ const PostFound = () => {
           </form>
         </div>
       </div>
-
-      {/* Toast Container */}
-      <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
     </div>
   );
 };
