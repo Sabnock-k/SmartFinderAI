@@ -39,6 +39,8 @@ const ApprovedItems = () => {
   }, []);
 
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this item?")) return;
+
     try {
       setDeletingId(id);
       await axios.delete(`${API_BASE}/api/admin/approved-items/${id}`);
@@ -81,10 +83,11 @@ const ApprovedItems = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">
-      {/* admin nav */}
       <AdminNav />
       <ToastContainer />
+
       <div className="max-w-6xl mx-auto px-4 py-10">
+        {/* Search and Filter */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -109,62 +112,109 @@ const ApprovedItems = () => {
           </select>
         </div>
 
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-white text-3xl font-bold">Approved Items</h2>
-          <span className="text-white/90">{approvedItems.length} items</span>
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="font-black text-white text-4xl md:text-5xl mb-4 drop-shadow-lg tracking-tight">
+            Approved Items
+          </h1>
+          <p className="text-lg text-blue-100">
+            {approvedItems.length}{" "}
+            {approvedItems.length === 1 ? "item" : "items"} approved
+          </p>
         </div>
 
-        <div className="grid gap-4">
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <ClipLoader size={50} color="#fff" />
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="bg-white/90 rounded-xl p-8 text-center">
-              <Package className="mx-auto w-12 h-12 text-gray-400 mb-3" />
-              <p className="text-gray-700">No Approved Items</p>
-            </div>
-          ) : (
-            filtered.map((item) => (
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <ClipLoader size={50} color="#fff" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="bg-white/90 rounded-2xl p-12 shadow-lg text-center">
+            <Package className="mx-auto w-16 h-16 text-gray-400 mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-3">
+              No Approved Items
+            </h2>
+            <p className="text-gray-600">
+              There are no approved items to display at the moment.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((item) => (
               <div
                 key={item.found_item_id}
-                className="bg-white rounded-xl shadow-md p-6"
+                className="bg-white/90 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="font-bold text-lg">{item.description}</h3>
-                    <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full mt-1">
-                      {item.category}
-                    </span>
+                {/* Image */}
+                <div className="h-48 bg-gray-200 overflow-hidden">
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={item.description}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <span className="text-6xl">📦</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="p-5">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      {item.category && (
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">
+                          {item.category}
+                        </span>
+                      )}
+                    </div>
                   </div>
+
+                  <p className="text-gray-800 font-medium mb-3 line-clamp-2">
+                    {item.description}
+                  </p>
+
+                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                    <div className="flex items-start gap-2">
+                      <span>📍</span>
+                      <span className="flex-1">
+                        {item.location_description}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span>📅</span>
+                      <span className="flex-1">
+                        {new Date(item.date_time_found).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span>👤</span>
+                      <span className="flex-1">{item.full_name}</span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
                   <button
                     onClick={() => handleDelete(item.found_item_id)}
                     disabled={deletingId === item.found_item_id}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[40px]"
+                    className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {deletingId === item.found_item_id ? (
-                      <ClipLoader size={20} color="#dc2626" />
+                      <ClipLoader size={16} color="#ffffff" />
                     ) : (
-                      <Trash2 className="w-5 h-5" />
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </>
                     )}
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                  <p>
-                    <strong>Location:</strong> {item.location_description}
-                  </p>
-                  <p>
-                    <strong>Found:</strong>{" "}
-                    {new Date(item.date_time_found).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <strong>Reported by:</strong> {item.full_name}
-                  </p>
-                </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
