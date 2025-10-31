@@ -16,7 +16,7 @@ import getReportedItemsHandler from "./admin-handlers/reported-items.js";
 import getApprovedItemsHandler from "./admin-handlers/approved-items.js";
 
 const app = express();
-const isProduction = false; // Change to true when deploying to production
+const isProduction = true; // Change to true when deploying to production
 
 app.use(
   cors({
