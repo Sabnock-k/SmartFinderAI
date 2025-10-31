@@ -1,9 +1,13 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Handlers
 import loginHandler from "./handlers/login.js";
 import registerHandler from "./handlers/register.js";
-import forgotPasswordHandler from "./handlers/forgot-password.js"; // Assuming you handle password reset here
+import forgotPasswordHandler from "./handlers/forgot-password.js";
 import updateProfileHandler from "./handlers/update-profile.js";
 import updatePasswordHandler from "./handlers/update-password.js";
 import uploadFoundItemHandler from "./handlers/found-item.js";
@@ -16,18 +20,25 @@ import getReportedItemsHandler from "./admin-handlers/reported-items.js";
 import getApprovedItemsHandler from "./admin-handlers/approved-items.js";
 
 const app = express();
-const isProduction = true; // Change to true when deploying to production
 
+// Get correct directory paths (for ESM)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const isProduction = process.env.NODE_ENV === "production";
+
+// --- MIDDLEWARE ---
 app.use(
   cors({
     origin: process.env.VITE_API_URL || "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"], // allowed HTTP methods
-    credentials: true, // if you use cookies/auth
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   })
 );
 
 app.use(express.json());
 
+// --- API ROUTES ---
 app.use("/api/login", loginHandler);
 app.use("/api/register", registerHandler);
 app.use("/api/forgot-password", forgotPasswordHandler);
@@ -38,18 +49,28 @@ app.use("/api/items", ItemsHandler);
 app.use("/api/stats", statsHandler);
 
 // Admin routes
-// users
 app.use("/api/admin/users", getUsersHandler);
 app.use("/api/admin/users/:id", getUsersHandler);
-// items
 app.use("/api/admin/reported-items", getReportedItemsHandler);
 app.use("/api/admin/reported-items/:id/approve", getReportedItemsHandler);
 app.use("/api/admin/reported-items/:id/reject", getReportedItemsHandler);
 app.use("/api/admin/approved-items", getApprovedItemsHandler);
 app.use("/api/admin/approved-items/:id", getApprovedItemsHandler);
 
-if (!isProduction) {
-  app.listen(5000, () => console.log("Server running on port 5000"));
+// --- FRONTEND (Vite Build) ---
+if (isProduction) {
+  const distPath = path.join(__dirname, "../dist");
+  app.use(express.static(distPath));
+
+  // For React Router (SPA) support
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+} else {
+  // Local dev server
+  app.listen(5000, () =>
+    console.log("Server running on http://localhost:5000")
+  );
 }
-// Export the Express app for Vercel
+
 export default app;
