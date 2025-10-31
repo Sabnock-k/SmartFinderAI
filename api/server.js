@@ -57,17 +57,7 @@ app.use("/api/admin/reported-items/:id/reject", getReportedItemsHandler);
 app.use("/api/admin/approved-items", getApprovedItemsHandler);
 app.use("/api/admin/approved-items/:id", getApprovedItemsHandler);
 
-// --- FRONTEND (Vite Build) ---
-if (isProduction) {
-  const distPath = path.join(__dirname, "../dist");
-  app.use(express.static(distPath));
-
-  // For React Router (SPA) support
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
-  });
-} else {
-  // Local dev server
+if (!isProduction) {
   app.listen(5000, () =>
     console.log("Server running on http://localhost:5000")
   );
