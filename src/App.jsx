@@ -9,7 +9,7 @@ import ForgotPassword from "./pages/forgotpass.jsx";
 import ResetPassword from "./components/resetpass.jsx";
 import PostItem from "./pages/post-found.jsx"; // Ensure this import matches the updated export in post-found.jsx\
 import ClaimItem from "./pages/claim-item.jsx";
-import TestPage from "./pages/test-page.jsx";
+//import TestPage from "./pages/test-page.jsx";
 
 // Admin Panel
 import AdminPanel from "./pages/admin/admin-panel.jsx";
@@ -23,7 +23,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/test" element={<TestPage />} />
+        {/* <Route path="/test" element={<TestPage />} /> */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
