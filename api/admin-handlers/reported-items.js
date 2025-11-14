@@ -32,8 +32,13 @@ router.put("/:id/approve", async (req, res) => {
       [itemId]
     );
 
+    await pool.query(
+      "UPDATE users SET points = points + 20 WHERE user_id = $1",
+      [userId]
+    );
+
     // Create notification
-    const message = `Your reported item has been approved.`;
+    const message = `Your reported item has been approved. You have earned 20 points.`;
     await pool.query(
       "INSERT INTO notifications (recipient_user_id, found_item_id, message) VALUES ($1, $2, $3)",
       [userId, itemId, message]

@@ -43,8 +43,15 @@ router.post("/", async (req, res) => {
         is_approved,
         status,
         1 - (embedding <=> $2) AS match_score
-      FROM found_items
-      WHERE is_approved = true AND reunited = 'false' AND reported_by_user_id != $1
+      FROM found_items f
+      WHERE is_approved = true 
+      AND reunited = 'false' 
+      AND reported_by_user_id != $1
+      AND NOT EXISTS (
+        SELECT 1 
+        FROM claim_requests c
+        WHERE c.found_item_id = f.found_item_id
+        )
       ORDER BY embedding <=> $2
       LIMIT 10;
       `,

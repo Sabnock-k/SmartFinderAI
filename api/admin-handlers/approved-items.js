@@ -68,6 +68,7 @@ router.put("/:id/reunited", async (req, res) => {
       [itemId]
     );
 
+    // Get claim request details
     const result = await pool.query(
       `SELECT found_item_id, requested_by_user_id FROM claim_requests WHERE found_item_id = $1`,
       [itemId]
@@ -81,9 +82,23 @@ router.put("/:id/reunited", async (req, res) => {
       [claim.found_item_id, claim.requested_by_user_id]
     );
 
+    // Update found_items table to mark as reunited
     await pool.query(
       "UPDATE found_items SET reunited = TRUE, status = 'reunited' WHERE found_item_id = $1",
       [itemId]
+    );
+
+    // Give points to the founder
+    const founderResult = await pool.query(
+      "SELECT reported_by_user_id FROM found_items WHERE found_item_id = $1",
+      [itemId]
+    );
+
+    const founderId = founderResult.rows[0].reported_by_user_id;
+
+    await pool.query(
+      "UPDATE users SET points = points + 100 WHERE user_id = $1",
+      [founderId]
     );
 
     // Notify the reporter
@@ -93,7 +108,7 @@ router.put("/:id/reunited", async (req, res) => {
     );
     if (userResult.rows.length > 0) {
       const userId = userResult.rows[0].reported_by_user_id;
-      const message = `Your reported item has been successfully returned and marked as reunited.`;
+      const message = `Your reported item has been successfully returned and marked as reunited. You have earned 100 points.`;
       await pool.query(
         "INSERT INTO notifications (recipient_user_id, found_item_id, message) VALUES ($1, $2, $3)",
         [userId, itemId, message]
