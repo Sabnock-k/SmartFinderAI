@@ -4,8 +4,8 @@ import pool from "../utils/db.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  const { user_id, username, full_name, email } = req.body;
-
+  const { user_id, username, full_name, email, facebook_account_link } =
+    req.body;
   if (!user_id) {
     return res.status(400).json({ error: "User ID is required" });
   }
@@ -18,12 +18,16 @@ router.post("/", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "UPDATE users SET username = $1, full_name = $2, email = $3 WHERE user_id = $4",
-      [username, full_name, email, user_id]
+      `UPDATE users 
+       SET username = $1, full_name = $2, email = $3, facebook_account_link = $4 
+       WHERE user_id = $5`,
+      [username, full_name, email, facebook_account_link || null, user_id]
     );
+
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "User not found" });
     }
+
     res.json({ message: "Profile updated successfully" });
   } catch (error) {
     console.error("Error updating profile:", error);
