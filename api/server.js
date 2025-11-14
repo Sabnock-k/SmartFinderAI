@@ -16,6 +16,7 @@ import notificationHandler from "./handlers/notification.js";
 import itemsHandler from "./handlers/items.js";
 import claimItemHandler from "./handlers/claim-item.js";
 import statsHandler from "./handlers/stats.js";
+import rewardsHandler from "./handlers/rewards.js";
 import founderInfoHandler from "./handlers/founder-info.js";
 
 // Admin imports
@@ -56,6 +57,7 @@ app.use("/api/notifications", notificationHandler);
 app.use("/api/items", itemsHandler);
 app.use("/api/claim-item", claimItemHandler);
 app.use("/api/stats", statsHandler);
+app.use("/api/rewards", rewardsHandler);
 app.use("/api/founder-info", founderInfoHandler);
 
 // Admin routes
