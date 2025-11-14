@@ -1,7 +1,22 @@
+// routes/found-item.js
 import express from "express";
-import pool from "../utils/db.js"; // adjust path if needed
+import pool from "../utils/db.js";
+import OpenAI from "openai";
 
 const router = express.Router();
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// ⚙️ Helper: create embedding from description, location, date
+async function getEmbedding(description, location, dateTimeFound) {
+  const text = `${description.trim()} | Location: ${location || ""} | Date: ${
+    dateTimeFound || ""
+  }`;
+  const response = await openai.embeddings.create({
+    model: "text-embedding-3-large",
+    input: text,
+  });
+  return response.data[0].embedding; // returns array of numbers
+}
 
 router.post("/", async (req, res) => {
   try {
@@ -21,11 +36,21 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // 🔹 Generate embedding
+    const embedding = await getEmbedding(
+      description,
+      location_description,
+      date_time_found
+    );
+
+    const vectorLiteral = `[${embedding.join(",")}]`;
+
+    // 🔹 Insert into DB with embedding
     const result = await pool.query(
       `INSERT INTO found_items 
-             (reported_by_user_id, description, category, image_url, location_description, date_time_found) 
-             VALUES ($1, $2, $3, $4, $5, $6)
-             RETURNING *`,
+         (reported_by_user_id, description, category, image_url, location_description, date_time_found, embedding) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7::vector)
+         RETURNING *`,
       [
         reported_by_user_id,
         description,
@@ -33,6 +58,7 @@ router.post("/", async (req, res) => {
         image_url || null,
         location_description || null,
         date_time_found,
+        vectorLiteral,
       ]
     );
 
@@ -41,6 +67,7 @@ router.post("/", async (req, res) => {
       item: result.rows[0],
     });
   } catch (err) {
+    console.error("❌ Error inserting found item:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
