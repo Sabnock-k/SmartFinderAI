@@ -1,13 +1,34 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react"; // Lucide icons for burger & close
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const Navbar = ({ user }) => {
   const avatarRef = useRef(null);
   const dropdownRef = useRef(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   const navigate = useNavigate();
+
+  const fetchNotificationCount = async () => {
+    try {
+      const response = await axios.get(
+        `${API_BASE}/api/notifications/${user.user_id}/count`
+      );
+      setNotificationCount(response.data.count);
+    } catch (error) {
+      console.error("Error fetching notification count:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotificationCount();
+    }
+  }, [user]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -57,6 +78,14 @@ const Navbar = ({ user }) => {
             className="w-10 h-10 rounded-full cursor-pointer border-2 border-white/50"
             onClick={() => setDropdownOpen((s) => !s)}
           />
+
+          {/* Notification Badge */}
+          {notificationCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+              {notificationCount}
+            </span>
+          )}
+
           {dropdownOpen && (
             <div
               ref={dropdownRef}
@@ -85,22 +114,10 @@ const Navbar = ({ user }) => {
               </div>
               <hr className="border-gray-200" />
               <button
-                onClick={() => navigate("/settings")}
-                className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                Settings & Privacy
-              </button>
-              <button
                 onClick={() => navigate("/help")}
                 className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
               >
                 Help & Support
-              </button>
-              <button
-                onClick={() => navigate("/display")}
-                className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                Display & Accessibility
               </button>
               <hr className="border-gray-200" />
               <button

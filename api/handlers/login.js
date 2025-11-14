@@ -7,7 +7,6 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   const { username, password } = req.body;
 
-  // basic validation/sanitization
   const identifier = (username || "").trim();
 
   if (!identifier || !password) {
@@ -27,6 +26,12 @@ router.post("/", async (req, res) => {
     );
 
     const user = result.rows[0];
+
+    if (!user) {
+      // No user found
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
+
     const match = await bcrypt.compare(password, user.password_hash);
 
     if (!match) {

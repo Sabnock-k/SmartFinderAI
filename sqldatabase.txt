@@ -10,40 +10,54 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
+    facebook_account_link VARCHAR(255),
     password_hash VARCHAR(255) NOT NULL,
+    points INT DEFAULT 0,
     is_admin BOOLEAN DEFAULT FALSE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table: found_items
 CREATE TABLE found_items (
-    found_item_id SERIAL PRIMARY KEY, -- auto-increment integer
-    reported_by_user_id INTEGER NOT NULL,
-    description TEXT NOT NULL,
-    category VARCHAR(100),
-    image_url VARCHAR(255),
-    location_description VARCHAR(255),
-    date_time_found TIMESTAMP NOT NULL,
-    is_approved BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    embedding VECTOR(768),  -- requires pgvector extension
+    found_item_id SERIAL PRIMARY KEY,                -- auto-increment integer
+    reported_by_user_id INTEGER NOT NULL,            -- FK to users table
+    description TEXT NOT NULL,                       -- description of the found item
+    category VARCHAR(100),                           -- optional category
+    image_url VARCHAR(255),                          -- image link
+    location_description VARCHAR(255),               -- where it was found
+    date_time_found TIMESTAMP NOT NULL,              -- when it was found
+    is_approved BOOLEAN DEFAULT false,               -- moderation flag
+    reunited BOOLEAN DEFAULT false,                  -- whether item is reunited with owner
+    status VARCHAR(50) DEFAULT 'available', -- current item status
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- auto-set on insert
+    embedding VECTOR(3072),                          -- requires pgvector
 
-    -- Foreign key to users table
+    -- Foreign key constraint to users table
     CONSTRAINT fk_reported_by FOREIGN KEY (reported_by_user_id)
         REFERENCES users(user_id)
         ON DELETE CASCADE
 );
 
--- Table: claim_requests
+
 CREATE TABLE claim_requests (
-    claim_request_id INT AUTO_INCREMENT PRIMARY KEY,
+    claim_request_id SERIAL PRIMARY KEY,
     found_item_id INT NOT NULL,
     requested_by_user_id INT NOT NULL,
-    claim_message TEXT,
-    requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (found_item_id) REFERENCES found_items(found_item_id) ON DELETE CASCADE,
-    FOREIGN KEY (requested_by_user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    founder_confirmed BOOLEAN DEFAULT FALSE,     -- founder clicks "Returned"
+    claimer_confirmed BOOLEAN DEFAULT FALSE,     -- claimer clicks "Returned"
+    admin_approved BOOLEAN DEFAULT FALSE,        -- admin final approval
+    status VARCHAR(50) DEFAULT 'pending',        -- pending, confirmed, approved, rejected
+
+    CONSTRAINT fk_found_item FOREIGN KEY (found_item_id)
+        REFERENCES found_items(found_item_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_requested_by FOREIGN KEY (requested_by_user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
 );
+
 
 -- Table: claimed_items
 CREATE TABLE claimed_items (
@@ -60,22 +74,25 @@ CREATE TABLE notifications (
     notification_id INT AUTO_INCREMENT PRIMARY KEY,
     recipient_user_id INT NOT NULL,
     found_item_id INT NOT NULL,
-    claim_request_id INT,
     message TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (recipient_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (found_item_id) REFERENCES found_items(found_item_id) ON DELETE CASCADE,
-    FOREIGN KEY (claim_request_id) REFERENCES claim_requests(claim_request_id) ON DELETE CASCADE
 );
 
--- Table: rewards
-CREATE TABLE rewards (
-    reward_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    found_item_id INT NOT NULL,
-    data_amount_mb INT DEFAULT 0,             -- Internet data in megabytes
-    reward_description VARCHAR(255),          -- Optional description
-    awarded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (found_item_id) REFERENCES found_items(found_item_id) ON DELETE CASCADE
+-- REWARDS CATALOG (Available rewards)
+CREATE TABLE rewards_catalog (
+    reward_id SERIAL PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description TEXT,
+    points_cost INT NOT NULL,
+    icon VARCHAR(50),
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE reward_redemptions (
+    redemption_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    reward_id INT NOT NULL REFERENCES rewards_catalog(reward_id),
+    redeemed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
