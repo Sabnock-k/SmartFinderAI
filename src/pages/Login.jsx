@@ -226,8 +226,8 @@ function Login() {
               </div>
             </div>
             <div className="mt-3 sm:mt-4">
-              <a
-                href="/register"
+              <button
+                onClick={() => navigate("/register")}
                 className="inline-flex items-center px-4 sm:px-6 py-2 border-2 border-[#3949ab] text-[#3949ab] hover:bg-[#3949ab] hover:text-white font-semibold rounded-xl transition-all duration-300 text-sm sm:text-base"
               >
                 <svg
@@ -244,7 +244,7 @@ function Login() {
                   />
                 </svg>
                 Create an account
-              </a>
+              </button>
             </div>
           </div>
         </div>
