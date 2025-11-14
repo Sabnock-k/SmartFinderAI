@@ -20,10 +20,25 @@ router.get("/", async (req, res) => {
 router.put("/:id/approve", async (req, res) => {
   const itemId = req.params.id;
   try {
+    // Get the user who reported the item
+    const userResult = await pool.query(
+      "SELECT reported_by_user_id FROM found_items WHERE found_item_id = $1",
+      [itemId]
+    );
+    const userId = userResult.rows[0].reported_by_user_id;
+
     await pool.query(
       "UPDATE found_items SET is_approved = 'TRUE' WHERE found_item_id = $1",
       [itemId]
     );
+
+    // Create notification
+    const message = `Your reported item has been approved.`;
+    await pool.query(
+      "INSERT INTO notifications (recipient_user_id, found_item_id, message) VALUES ($1, $2, $3)",
+      [userId, itemId, message]
+    );
+
     res.status(204).send();
   } catch (error) {
     console.error("Error approving reported item:", error);
@@ -35,6 +50,20 @@ router.put("/:id/approve", async (req, res) => {
 router.delete("/:id/reject", async (req, res) => {
   const itemId = req.params.id;
   try {
+    // Get the user who reported the item
+    const userResult = await pool.query(
+      "SELECT reported_by_user_id FROM found_items WHERE found_item_id = $1",
+      [itemId]
+    );
+    const userId = userResult.rows[0].reported_by_user_id;
+
+    // Create notification
+    const message = `Your reported item has been rejected.`;
+    await pool.query(
+      "INSERT INTO notifications (recipient_user_id, found_item_id, message) VALUES ($1, $2, $3)",
+      [userId, itemId, message]
+    );
+
     await pool.query(
       "DELETE FROM found_items WHERE found_item_id = $1 RETURNING *;",
       [itemId]

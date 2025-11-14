@@ -38,6 +38,7 @@ const ReportedItems = () => {
 
   const handleApprove = async (id) => {
     try {
+      setLoading(true);
       await axios.put(`${API_BASE}/api/admin/reported-items/${id}/approve`);
       setReportedItems((p) => p.filter((i) => i.found_item_id !== id));
       toast.success("Item approved successfully", {
@@ -50,12 +51,14 @@ const ReportedItems = () => {
         position: "top-center",
         autoClose: 3000,
       });
-      return;
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleReject = async (id) => {
     try {
+      setLoading(true);
       await axios.delete(`${API_BASE}/api/admin/reported-items/${id}/reject`);
       setReportedItems((p) => p.filter((i) => i.found_item_id !== id));
       toast.success("Item rejected successfully", {
@@ -68,7 +71,8 @@ const ReportedItems = () => {
         position: "top-center",
         autoClose: 3000,
       });
-      return;
+    } finally {
+      setLoading(false);
     }
   };
 
