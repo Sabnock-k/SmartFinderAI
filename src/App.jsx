@@ -3,12 +3,13 @@ import LandingPage from "./pages/landingpage.jsx";
 import Login from "./pages/Login.jsx";
 import Homepage from "./pages/homepage.jsx";
 import Items from "./pages/items.jsx";
+import RewardsPage from "./pages/rewards.jsx";
 import Profile from "./pages/profile.jsx";
 import Register from "./pages/register.jsx";
 import ForgotPassword from "./pages/forgotpass.jsx";
 import ResetPassword from "./components/resetpass.jsx";
 import PostItem from "./pages/post-found.jsx"; // Ensure this import matches the updated export in post-found.jsx\
-import ClaimItem from "./pages/claim-item.jsx";
+import SearchItem from "./pages/search-item.jsx";
 //import TestPage from "./pages/test-page.jsx";
 
 // Admin Panel
@@ -30,10 +31,11 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/recover" element={<ResetPassword />} />
         <Route path="/home" element={<Homepage />} />
+        <Route path="/rewards" element={<RewardsPage />} />
         <Route path="/items" element={<Items />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/post-found" element={<PostItem />} />
-        <Route path="/claim-item" element={<ClaimItem />} />
+        <Route path="/search-item" element={<SearchItem />} />
 
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/admin/users" element={<UsersPage />} />

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import AdminNav from "../../components/admin-nav";
 import { Users, Package, CheckCircle, Clock, TrendingUp } from "lucide-react";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const StatCard = ({ icon: Icon, label, value, trend }) => (
   <div className="bg-white rounded-xl p-6 shadow-lg">
@@ -20,30 +23,62 @@ const StatCard = ({ icon: Icon, label, value, trend }) => (
 const AnalyticsPage = () => {
   const [user] = useState(JSON.parse(localStorage.getItem("user") || "null"));
   const [analytics, setAnalytics] = useState(null);
-
-  if (!user || user.is_admin !== true) {
-    navigate("/home");
-  }
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const load = async () => {
-      await new Promise((r) => setTimeout(r, 400));
-      setAnalytics({
-        totalUsers: 156,
-        activeListings: 23,
-        itemsReunited: 45,
-        pendingReports: 8,
-        weeklyGrowth: 12.5,
-        monthlyActivity: [
-          { month: "Jan", reports: 12, reunited: 8 },
-          { month: "Feb", reports: 15, reunited: 10 },
-          { month: "Mar", reports: 20, reunited: 14 },
-          { month: "Apr", reports: 18, reunited: 12 },
-        ],
-      });
+    if (!user || user.is_admin !== true) {
+      window.location.href = "/home";
+      return;
+    }
+
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_BASE}/api/admin/analytics`);
+
+        setAnalytics({
+          totalUsers: response.data.userCount,
+          activeListings: response.data.approvedCount,
+          pendingReports: response.data.pendingCount,
+        });
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching analytics:", err);
+        setError("Failed to load analytics data");
+      } finally {
+        setLoading(false);
+      }
     };
-    load();
-  }, []);
+
+    fetchAnalytics();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">
+        <AdminNav />
+        <div className="max-w-7xl mx-auto px-4 py-10">
+          <div className="text-white text-center text-xl">
+            Loading analytics...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">
+        <AdminNav />
+        <div className="max-w-7xl mx-auto px-4 py-10">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg">
+            {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">
@@ -52,24 +87,18 @@ const AnalyticsPage = () => {
       <div className="max-w-7xl mx-auto px-4 py-10">
         <h2 className="text-white text-3xl font-bold mb-6">System Analytics</h2>
 
-        {analytics ? (
+        {analytics && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <StatCard
                 icon={Users}
                 label="Total Users"
                 value={analytics.totalUsers}
-                trend={analytics.weeklyGrowth}
               />
               <StatCard
                 icon={Package}
                 label="Active Listings"
                 value={analytics.activeListings}
-              />
-              <StatCard
-                icon={CheckCircle}
-                label="Items Reunited"
-                value={analytics.itemsReunited}
               />
               <StatCard
                 icon={Clock}
@@ -79,35 +108,35 @@ const AnalyticsPage = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
-                Monthly Activity
-              </h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Overview</h3>
               <div className="space-y-4">
-                {analytics.monthlyActivity.map((m, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
-                      <span>{m.month}</span>
-                      <span>
-                        {m.reports} reports / {m.reunited} reunited
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-blue-500 to-green-500 h-full rounded-full"
-                        style={{
-                          width: `${
-                            (m.reunited / Math.max(1, m.reports)) * 100
-                          }%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                  <span className="text-gray-600 font-medium">
+                    Total Registered Users
+                  </span>
+                  <span className="text-2xl font-bold text-blue-600">
+                    {analytics.totalUsers}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                  <span className="text-gray-600 font-medium">
+                    Approved Items
+                  </span>
+                  <span className="text-2xl font-bold text-green-600">
+                    {analytics.activeListings}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-3">
+                  <span className="text-gray-600 font-medium">
+                    Pending Approvals
+                  </span>
+                  <span className="text-2xl font-bold text-orange-600">
+                    {analytics.pendingReports}
+                  </span>
+                </div>
               </div>
             </div>
           </>
-        ) : (
-          <div className="text-white">Loading analytics...</div>
         )}
       </div>
     </div>

@@ -126,7 +126,7 @@ const Homepage = () => {
               Browse or filter the list of items reported lost.
             </p>
             <button
-              onClick={() => navigate("/search")}
+              onClick={() => navigate("/search-item")}
               className="px-5 py-2 bg-blue-700 text-white rounded-full font-semibold shadow hover:bg-blue-900 transition cursor-pointer"
             >
               Search Now
