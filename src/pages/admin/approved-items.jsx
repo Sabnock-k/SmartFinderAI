@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNav from "../../components/admin-nav";
-import { Search, Package, Trash2 } from "lucide-react";
+import { Search, Package, Trash2, Loader2 } from "lucide-react"; // ← Import Loader2
 import { ToastContainer, toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
+import "react-toastify/dist/ReactToastify.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -14,9 +15,10 @@ const ApprovedItems = () => {
   const [approvedItems, setApprovedItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [approvingId, setApprovingId] = useState(null); // ← Loading state for approval
 
   if (!user || user.is_admin !== true) {
-    navigate("/home");
+    window.location.href = "/home";
   }
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const ApprovedItems = () => {
         setApprovedItems(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
         console.error("Error fetching approved items:", err);
-        alert(err.response?.data?.error || err.message);
+        toast.error(err.response?.data?.error || err.message);
       } finally {
         setLoading(false);
       }
@@ -40,23 +42,34 @@ const ApprovedItems = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
-
     try {
       setDeletingId(id);
       await axios.delete(`${API_BASE}/api/admin/approved-items/${id}`);
       setApprovedItems((p) => p.filter((i) => i.found_item_id !== id));
-      toast.success("Item deleted successfully", {
-        position: "top-center",
-        autoClose: 3000,
-      });
+      toast.success("Item deleted successfully");
     } catch (err) {
-      console.error("Error deleting approved item:", err);
-      toast.error(err.response?.data?.error || "Failed to delete item", {
-        position: "top-center",
-        autoClose: 3000,
-      });
+      console.error(err);
+      toast.error("Failed to delete item");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleReunited = async (id) => {
+    try {
+      setApprovingId(id); // ← Start loader
+      await axios.put(`${API_BASE}/api/admin/approved-items/${id}/reunited`);
+      setApprovedItems((prev) =>
+        prev.map((item) =>
+          item.found_item_id === id ? { ...item, reunited: true } : item
+        )
+      );
+      toast.success("Item marked as reunited!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to mark item as reunited.");
+    } finally {
+      setApprovingId(null); // ← Stop loader
     }
   };
 
@@ -85,7 +98,6 @@ const ApprovedItems = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">
       <AdminNav />
       <ToastContainer />
-
       <div className="max-w-6xl mx-auto px-4 py-10">
         {/* Search and Filter */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -123,7 +135,6 @@ const ApprovedItems = () => {
           </p>
         </div>
 
-        {/* Loading State */}
         {loading ? (
           <div className="flex justify-center py-12">
             <ClipLoader size={50} color="#fff" />
@@ -135,7 +146,7 @@ const ApprovedItems = () => {
               No Approved Items
             </h2>
             <p className="text-gray-600">
-              There are no approved items to display at the moment.
+              There are no approved items to display.
             </p>
           </div>
         ) : (
@@ -145,8 +156,7 @@ const ApprovedItems = () => {
                 key={item.found_item_id}
                 className="bg-white/90 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1"
               >
-                {/* Image */}
-                <div className="h-48 bg-gray-200 overflow-hidden">
+                <div className="h-48 bg-gray-200 overflow-hidden flex items-center justify-center">
                   {item.image_url ? (
                     <img
                       src={item.image_url}
@@ -154,29 +164,21 @@ const ApprovedItems = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <span className="text-6xl">📦</span>
-                    </div>
+                    <span className="text-6xl text-gray-400">📦</span>
                   )}
                 </div>
 
-                {/* Content */}
-                <div className="p-5">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      {item.category && (
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">
-                          {item.category}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <p className="text-gray-800 font-medium mb-3 line-clamp-2">
+                <div className="p-5 space-y-2">
+                  {item.category && (
+                    <span className="text-xs text-gray-500 uppercase tracking-wide font-semibold">
+                      {item.category}
+                    </span>
+                  )}
+                  <p className="text-gray-800 font-medium text-lg line-clamp-2">
                     {item.description}
                   </p>
 
-                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                  <div className="space-y-1 text-sm text-gray-600">
                     <div className="flex items-start gap-2">
                       <span>📍</span>
                       <span className="flex-1">
@@ -186,7 +188,8 @@ const ApprovedItems = () => {
                     <div className="flex items-start gap-2">
                       <span>📅</span>
                       <span className="flex-1">
-                        {new Date(item.date_time_found).toLocaleDateString()}
+                        {item.date_time_found &&
+                          new Date(item.date_time_found).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="flex items-start gap-2">
@@ -195,18 +198,63 @@ const ApprovedItems = () => {
                     </div>
                   </div>
 
-                  {/* Actions */}
+                  {item.admin_approved ? (
+                    <p className="text-sm text-green-700 font-medium">
+                      <span className="font-medium text-gray-500">Status:</span>{" "}
+                      Reunited
+                    </p>
+                  ) : item.founder_confirmed && item.claimer_confirmed ? (
+                    <p className="text-sm text-green-700 font-medium">
+                      <span className="font-medium text-gray-500">Status:</span>{" "}
+                      Founder and Owner both confirmed
+                    </p>
+                  ) : (
+                    <p
+                      className={`text-sm font-medium ${
+                        item.status === "available"
+                          ? "text-green-700"
+                          : "text-black"
+                      }`}
+                    >
+                      <span className="font-medium text-gray-500">Status:</span>{" "}
+                      {item.status}
+                    </p>
+                  )}
+
+                  {/* Approved Return Button */}
+                  {!item.reunited &&
+                    item.founder_confirmed &&
+                    item.claimer_confirmed && (
+                      <button
+                        onClick={() => handleReunited(item.found_item_id)}
+                        className="w-full mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex justify-center items-center gap-2"
+                        disabled={approvingId === item.found_item_id} // disable while loading
+                      >
+                        {approvingId === item.found_item_id ? (
+                          <Loader2 className="animate-spin w-5 h-5" />
+                        ) : (
+                          "Approved Return"
+                        )}
+                      </button>
+                    )}
+
+                  {item.reunited && (
+                    <p className="text-green-700 font-medium text-center mt-2">
+                      Item has been reunited
+                    </p>
+                  )}
+
+                  {/* Delete Button */}
                   <button
                     onClick={() => handleDelete(item.found_item_id)}
                     disabled={deletingId === item.found_item_id}
-                    className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full mt-2 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {deletingId === item.found_item_id ? (
-                      <ClipLoader size={16} color="#ffffff" />
+                      <ClipLoader size={16} color="#fff" />
                     ) : (
                       <>
-                        <Trash2 className="w-4 h-4" />
-                        Delete
+                        <Trash2 className="w-4 h-4" /> Delete
                       </>
                     )}
                   </button>
