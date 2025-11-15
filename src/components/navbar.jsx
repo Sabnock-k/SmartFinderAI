@@ -38,7 +38,7 @@ const Navbar = ({ user }) => {
 
   return (
     <header className="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-      <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
+      <nav className="container mx-auto px-6 py-3 flex justify-between items-center md:py-1">
         {/* Left: Logo */}
         <div
           className="flex items-center cursor-pointer gap-2"
