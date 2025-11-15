@@ -86,7 +86,7 @@ const Homepage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10 pointer-events-none z-0">
         <div className="absolute top-10 left-10 w-32 h-32 border-2 border-white rounded-full"></div>
@@ -96,9 +96,7 @@ const Homepage = () => {
       </div>
 
       {/* Navbar */}
-      <div className="z-20">
-        <Navbar user={user} />
-      </div>
+      <Navbar user={user} />
 
       {/* Hero Section */}
       <main
