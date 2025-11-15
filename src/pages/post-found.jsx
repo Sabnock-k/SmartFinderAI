@@ -158,7 +158,7 @@ const PostFound = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10 pointer-events-none z-0">
         <div className="absolute top-10 left-10 w-32 h-32 border-2 border-white rounded-full"></div>
@@ -172,11 +172,8 @@ const PostFound = () => {
         <Navbar user={user} />
       </div>
 
-      {/* Toast Container */}
-      <ToastContainer />
-
       {/* Main Content */}
-      <div className="flex flex-1 flex-col items-center justify-center px-4 sm:px-6 sm:-translate-y-[50px] z-10 w-full">
+      <div className="flex flex-1 flex-col items-center justify-center px-4 pt-15 sm:px-6 sm:-translate-y-[50px] z-10 w-full">
         {/* Header */}
         <div className="w-full max-w-3xl text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
@@ -325,6 +322,9 @@ const PostFound = () => {
           </form>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   );
 };
