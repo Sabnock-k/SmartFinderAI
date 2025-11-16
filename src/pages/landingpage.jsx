@@ -191,7 +191,7 @@ const LandingPage = () => {
             <FeatureCard
               icon={<Sparkles size={32} className="text-indigo-600" />}
               title="2. AI-Powered Matching"
-              description="Our smart AI gets to work, instantly comparing your report against the entire database to find potential matches."
+              description="Search and let our smart AI get to work, instantly compare the description of your lost item against the entire database to find potential matches."
               aosAnimation="fade-up"
               data-aos-delay="200"
             />
