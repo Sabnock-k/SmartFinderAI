@@ -4,8 +4,15 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [tailwindcss(), react()],
-  build: {
-    outDir: "dist",
-  },
   base: "./",
+  build: {
+    outDir: "dist", // default, matches Vercel static build
+    assetsDir: "assets", // keeps assets in /dist/assets
+    sourcemap: false,
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
 });
