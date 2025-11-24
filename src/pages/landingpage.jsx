@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Facebook,
   Instagram,
@@ -10,7 +11,6 @@ import {
   Menu,
   X,
 } from "lucide-react";
-// Do not import AOS here, we will load it dynamically
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -31,6 +31,20 @@ const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // index to cycle through images
   const [imgIndex, setImgIndex] = useState(0);
+  const navigate = useNavigate();
+
+  // Images for the About section
+  const cfactionimg = ["cfaction.png", "cfaction2.png"];
+
+  // redirect to /home if user is logged in
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      navigate("/home");
+    } else {
+      navigate("/");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     AOS.init({
@@ -54,9 +68,6 @@ const LandingPage = () => {
     { name: "About", href: "#about" },
     { name: "Contact", href: "#contact" },
   ];
-
-  // Images for the About section
-  const cfactionimg = ["cfaction.png", "cfaction2.png"];
 
   return (
     <div className="w-full h-full scroll-smooth bg-gray-50">
