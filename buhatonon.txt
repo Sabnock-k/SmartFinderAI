@@ -1,0 +1,25 @@
+notification in navbar
+user management must include redeem points
+instruction for searaching in ai
+
+E JWT SIGURO ANG MGA DATA PARA SECURE
+
+{
+  "builds": [
+    {
+      "src": "api/server.js",
+      "use": "@vercel/node"
+    },
+    { "src": "package.json", "use": "@vercel/static-build" }
+  ],
+  "routes": [
+    {
+      "src": "^/api/(.*)$",
+      "dest": "/api/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

@@ -26,7 +26,7 @@ import getApprovedItemsHandler from "./admin-handlers/approved-items.js";
 
 const app = express();
 
-const isProduction = false;
+const isProduction = true;
 
 // --- MIDDLEWARE ---
 app.use(
