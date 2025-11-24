@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/landingpage.jsx";
-import Login from "./pages/Login.jsx";
+import Login from "./pages/login.jsx";
 import Homepage from "./pages/homepage.jsx";
 import Items from "./pages/items.jsx";
 import RewardsPage from "./pages/rewards.jsx";
@@ -8,7 +8,7 @@ import Profile from "./pages/profile.jsx";
 import Register from "./pages/register.jsx";
 import ForgotPassword from "./pages/forgotpass.jsx";
 import ResetPassword from "./components/resetpass.jsx";
-import PostItem from "./pages/post-found.jsx"; // Ensure this import matches the updated export in post-found.jsx\
+import PostItem from "./pages/post-found.jsx";
 import SearchItem from "./pages/search-item.jsx";
 //import TestPage from "./pages/test-page.jsx";
 
