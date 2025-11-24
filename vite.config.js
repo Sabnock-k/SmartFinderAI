@@ -6,9 +6,7 @@ export default defineConfig({
   plugins: [tailwindcss(), react()],
   base: "./",
   build: {
-    outDir: "dist", // default, matches Vercel static build
-    assetsDir: "assets", // keeps assets in /dist/assets
-    sourcemap: false,
+    outDir: "dist",
   },
   resolve: {
     alias: {
