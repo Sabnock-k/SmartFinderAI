@@ -6,7 +6,7 @@ import OpenAI from "openai";
 const router = express.Router();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ⚙️ Helper: generate embedding from user query
+// Helper: generate embedding from user query
 async function getEmbedding(query) {
   const cleaned = query.trim().toLowerCase().slice(0, 500);
   const response = await openai.embeddings.create({
@@ -52,6 +52,7 @@ router.post("/", async (req, res) => {
         FROM claim_requests c
         WHERE c.found_item_id = f.found_item_id
         )
+      AND (1 - (embedding <=> $2)) >= 0.5
       ORDER BY embedding <=> $2
       LIMIT 10;
       `,
