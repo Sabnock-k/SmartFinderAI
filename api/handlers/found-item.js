@@ -6,7 +6,7 @@ import OpenAI from "openai";
 const router = express.Router();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ⚙️ Helper: create embedding from description, location, date
+// Helper: create embedding from description, location, date
 async function getEmbedding(description, location, dateTimeFound) {
   const text = `${description.trim()} | Location: ${location || ""} | Date: ${
     dateTimeFound || ""
@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // 🔹 Generate embedding
+    //  Generate embedding
     const embedding = await getEmbedding(
       description,
       location_description,
@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
 
     const vectorLiteral = `[${embedding.join(",")}]`;
 
-    // 🔹 Insert into DB with embedding
+    //  Insert into DB with embedding
     const result = await pool.query(
       `INSERT INTO found_items 
          (reported_by_user_id, description, category, image_url, location_description, date_time_found, embedding) 
