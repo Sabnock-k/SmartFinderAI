@@ -4,35 +4,13 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Handlers
-import loginHandler from "./handlers/login.js";
-import registerHandler from "./handlers/register.js";
-import forgotPasswordHandler from "./handlers/forgot-password.js";
-import updateProfileHandler from "./handlers/update-profile.js";
-import updatePasswordHandler from "./handlers/update-password.js";
-import uploadFoundItemHandler from "./handlers/found-item.js";
-import searchItemHandler from "./handlers/search-items.js";
-import notificationHandler from "./handlers/notification.js";
-import itemsHandler from "./handlers/items.js";
-import claimItemHandler from "./handlers/claim-item.js";
-import statsHandler from "./handlers/stats.js";
-import rewardsHandler from "./handlers/rewards.js";
-import founderInfoHandler from "./handlers/founder-info.js";
-
-// Admin imports
-import updatePasswordHandlerAdmin from "./admin-handlers/update-password.js";
-import getAnalyticsHandler from "./admin-handlers/analytics.js";
-import getUsersHandler from "./admin-handlers/users.js";
-import getReportedItemsHandler from "./admin-handlers/reported-items.js";
-import getApprovedItemsHandler from "./admin-handlers/approved-items.js";
-
 const app = express();
 
-// Get correct directory paths (for ESM)
+// Paths (keep static)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const isProduction = false;
+const isProduction = true;
 
 // --- MIDDLEWARE ---
 app.use(
@@ -45,34 +23,54 @@ app.use(
 
 app.use(express.json());
 
-// --- API ROUTES ---
-app.use("/api/login", loginHandler);
-app.use("/api/register", registerHandler);
-app.use("/api/forgot-password", forgotPasswordHandler);
-app.use("/api/update-profile", updateProfileHandler);
-app.use("/api/update-password", updatePasswordHandler);
-app.use("/api/found-item", uploadFoundItemHandler);
-app.use("/api/search-items", searchItemHandler);
-app.use("/api/notifications", notificationHandler);
-app.use("/api/items", itemsHandler);
-app.use("/api/claim-item", claimItemHandler);
-app.use("/api/stats", statsHandler);
-app.use("/api/rewards", rewardsHandler);
-app.use("/api/founder-info", founderInfoHandler);
+const load = (path) => async (req, res, next) => {
+  const module = await import(path);
+  return module.default(req, res, next);
+};
+
+// User routes
+app.use("/api/login", load("./handlers/login.js"));
+app.use("/api/register", load("./handlers/register.js"));
+app.use("/api/forgot-password", load("./handlers/forgot-password.js"));
+app.use("/api/update-profile", load("./handlers/update-profile.js"));
+app.use("/api/update-password", load("./handlers/update-password.js"));
+app.use("/api/found-item", load("./handlers/found-item.js"));
+app.use("/api/search-items", load("./handlers/search-items.js"));
+app.use("/api/notifications", load("./handlers/notification.js"));
+app.use("/api/items", load("./handlers/items.js"));
+app.use("/api/claim-item", load("./handlers/claim-item.js"));
+app.use("/api/stats", load("./handlers/stats.js"));
+app.use("/api/rewards", load("./handlers/rewards.js"));
+app.use("/api/founder-info", load("./handlers/founder-info.js"));
 
 // Admin routes
-app.use("/api/admin/update-password", updatePasswordHandlerAdmin);
-app.use("/api/admin/analytics", getAnalyticsHandler);
-app.use("/api/admin/users", getUsersHandler);
-app.use("/api/admin/users/:id", getUsersHandler);
-app.use("/api/admin/reported-items", getReportedItemsHandler);
-app.use("/api/admin/reported-items/:id/approve", getReportedItemsHandler);
-app.use("/api/admin/reported-items/:id/reject", getReportedItemsHandler);
-app.use("/api/admin/approved-items", getApprovedItemsHandler);
+app.use(
+  "/api/admin/update-password",
+  load("./admin-handlers/update-password.js")
+);
+app.use("/api/admin/analytics", load("./admin-handlers/analytics.js"));
+app.use("/api/admin/users", load("./admin-handlers/users.js"));
+app.use("/api/admin/users/:id", load("./admin-handlers/users.js"));
+app.use(
+  "/api/admin/reported-items",
+  load("./admin-handlers/reported-items.js")
+);
+app.use(
+  "/api/admin/reported-items/:id/approve",
+  load("./admin-handlers/reported-items.js")
+);
+app.use(
+  "/api/admin/reported-items/:id/reject",
+  load("./admin-handlers/reported-items.js")
+);
+app.use(
+  "/api/admin/approved-items",
+  load("./admin-handlers/approved-items.js")
+);
 
 if (!isProduction) {
   app.listen(5000, () =>
-    console.log("Server running on http://localhost:5000")
+    console.log("Server running at http://localhost:5000")
   );
 }
 
