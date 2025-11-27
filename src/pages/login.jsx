@@ -123,7 +123,7 @@ function Login() {
                 className="block text-sm font-semibold text-[#1a237e] mb-2"
                 htmlFor="username"
               >
-                Username or email address
+                Username
               </label>
               <input
                 id="username"
