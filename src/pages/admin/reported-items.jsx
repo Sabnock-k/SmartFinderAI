@@ -234,10 +234,6 @@ const ReportedItems = () => {
                         Reject
                       </button>
                     </div>
-                    <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition">
-                      <Eye className="w-4 h-4" />
-                      View Details
-                    </button>
                   </div>
                 </div>
               </div>
