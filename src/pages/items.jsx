@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/navbar.jsx";
-import { Check, Loader2, MapPin, Calendar, Tag, ImageOff } from "lucide-react";
+import { Loader2, MapPin, Calendar, Tag, ImageOff } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AOS from "aos";
