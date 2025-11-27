@@ -17,6 +17,7 @@ const SearchPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [imageError, setImageError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -243,18 +244,13 @@ const SearchPage = () => {
                   onClick={() => setSelectedItem(item)}
                 >
                   <div className="flex flex-col md:flex-row gap-6">
-                    {item.image_url ? (
-                      <div className="flex-shrink-0">
-                        <img
-                          src={item.image_url}
-                          alt={item.description}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "";
-                          }}
-                          className="w-full md:w-48 h-48 object-cover rounded-xl border-2 border-blue-100"
-                        />
-                      </div>
+                    {imageError ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.description}
+                        onError={() => setImageError(true)}
+                        className="w-full md:w-48 h-48 object-cover rounded-xl border-2 border-blue-100"
+                      />
                     ) : (
                       <div className="flex flex-col items-center justify-center text-gray-500 bg-gray-200 w-full md:w-48 h-48">
                         <ImageOff className="w-auto h-auto mb-1" />
@@ -349,19 +345,16 @@ const SearchPage = () => {
                 </button>
               </div>
 
-              {selectedItem.image_url ? (
+              {imageError ? (
                 <img
                   src={selectedItem.image_url}
                   alt={selectedItem.description}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "";
-                  }}
-                  className="w-full h-64 object-cover rounded-xl mb-4 border-2 border-blue-100"
+                  onError={() => setImageError(true)}
+                  className="w-full md:w-48 h-48 object-cover rounded-xl border-2 border-blue-100"
                 />
               ) : (
-                <div className="flex flex-col items-center justify-center text-gray-500 bg-gray-200 w-full md:w-48 h-48">
-                  <ImageOff className="w-10 h-10 mb-1" />
+                <div className="h-48 w-full bg-gray-200 flex flex-col items-center justify-center text-gray-500">
+                  <ImageOff className="w-auto h-auto mb-1" />
                   <p className="text-sm">No Image Available</p>
                 </div>
               )}
