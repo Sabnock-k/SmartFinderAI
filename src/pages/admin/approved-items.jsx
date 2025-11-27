@@ -13,6 +13,7 @@ const ApprovedItems = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [approvedItems, setApprovedItems] = useState([]);
+  const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const [approvingId, setApprovingId] = useState(null); // ← Loading state for approval
@@ -157,10 +158,11 @@ const ApprovedItems = () => {
                 className="bg-white/90 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1"
               >
                 <div className="h-48 bg-gray-200 overflow-hidden flex items-center justify-center">
-                  {item.image_url ? (
+                  {imageError ? (
                     <img
                       src={item.image_url}
                       alt={item.description}
+                      onError={() => setImageError(true)}
                       className="w-full h-full object-cover"
                     />
                   ) : (
