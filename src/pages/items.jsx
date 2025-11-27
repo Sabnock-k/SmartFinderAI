@@ -146,6 +146,28 @@ const Items = () => {
     });
   };
 
+  // Reject claim (Founder Rejecting Claimer)
+  const handleRejectClaim = async (itemId) => {
+    try {
+      setFounderLoadingId(itemId); // reuse founder loading indicator
+      await axios.put(`${API_BASE}/api/claim-item/founder-reject`, { itemId });
+
+      toast.success("You rejected the claim request.");
+
+      setItems((prev) =>
+        prev.map((i) =>
+          i.found_item_id === itemId
+            ? { ...i, status: "rejected", founder_confirmed: false }
+            : i
+        )
+      );
+    } catch (err) {
+      toast.error("Failed to reject claim.");
+    } finally {
+      setFounderLoadingId(null);
+    }
+  };
+
   // Founder confirmation
   const handleFounderConfirm = async (itemId) => {
     try {
@@ -478,24 +500,46 @@ const Items = () => {
                               "A person is attempting to claim" ||
                               item.status === "claimer confirmed") &&
                               !item.founder_confirmed && (
-                                <button
-                                  onClick={() =>
-                                    handleFounderConfirm(item.found_item_id)
-                                  }
-                                  className="w-full mt-3 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl hover:from-green-700 hover:to-green-800 transition-all transform hover:scale-105 flex justify-center items-center gap-2 font-semibold shadow-lg"
-                                  disabled={
-                                    founderLoadingId === item.found_item_id
-                                  }
-                                >
-                                  {founderLoadingId === item.found_item_id ? (
-                                    <Loader2 className="animate-spin w-5 h-5" />
-                                  ) : (
-                                    <>
-                                      <CheckCircle2 size={20} />
-                                      Confirm Return
-                                    </>
-                                  )}
-                                </button>
+                                <div className="flex flex-col gap-2 mt-3">
+                                  {/* Confirm Return Button */}
+                                  <button
+                                    onClick={() =>
+                                      handleFounderConfirm(item.found_item_id)
+                                    }
+                                    className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl hover:from-green-700 hover:to-green-800 transition-all transform hover:scale-105 flex justify-center items-center gap-2 font-semibold shadow-lg"
+                                    disabled={
+                                      founderLoadingId === item.found_item_id
+                                    }
+                                  >
+                                    {founderLoadingId === item.found_item_id ? (
+                                      <Loader2 className="animate-spin w-5 h-5" />
+                                    ) : (
+                                      <>
+                                        <CheckCircle2 size={20} /> Confirm
+                                        Return
+                                      </>
+                                    )}
+                                  </button>
+
+                                  {/* Reject Claim Button */}
+                                  <button
+                                    onClick={() =>
+                                      handleRejectClaim(item.found_item_id)
+                                    }
+                                    className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-xl hover:from-red-700 hover:to-red-800 transition-all transform hover:scale-105 flex justify-center items-center gap-2 font-semibold shadow-lg"
+                                    disabled={
+                                      founderLoadingId === item.found_item_id
+                                    }
+                                  >
+                                    {founderLoadingId === item.found_item_id ? (
+                                      <Loader2 className="animate-spin w-5 h-5" />
+                                    ) : (
+                                      <>
+                                        <X size={20} /> Reject Claim
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
                               )}
                             {item.founder_confirmed && (
                               <div className="mt-3 bg-green-50 border border-green-200 text-green-700 py-2.5 rounded-xl text-center font-medium flex items-center justify-center gap-2">
