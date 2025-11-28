@@ -58,10 +58,7 @@ app.use("/api/founder-info", founderInfoHandler);
 app.use("/api/admin/update-password", updatePasswordHandlerAdmin);
 app.use("/api/admin/analytics", getAnalyticsHandler);
 app.use("/api/admin/users", getUsersHandler);
-app.use("/api/admin/users/:id", getUsersHandler);
 app.use("/api/admin/reported-items", getReportedItemsHandler);
-app.use("/api/admin/reported-items/:id/approve", getReportedItemsHandler);
-app.use("/api/admin/reported-items/:id/reject", getReportedItemsHandler);
 app.use("/api/admin/approved-items", getApprovedItemsHandler);
 
 if (!isProduction) {
