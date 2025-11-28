@@ -57,14 +57,6 @@ const ReportedItems = () => {
   }, []);
 
   const handleApprove = async (id) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to approve this item? The reporter will earn 20 points."
-      )
-    ) {
-      return;
-    }
-
     try {
       setActionLoading(id);
       await axios.put(`${API_BASE}/api/admin/reported-items/${id}/approve`);
@@ -88,11 +80,6 @@ const ReportedItems = () => {
   };
 
   const handleReject = async (id) => {
-    const reason = window.prompt(
-      "Please provide a reason for rejection (optional):"
-    );
-    if (reason === null) return; // User cancelled
-
     try {
       setActionLoading(id);
       await axios.delete(`${API_BASE}/api/admin/reported-items/${id}/reject`);
