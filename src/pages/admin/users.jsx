@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import AdminNav from "../../components/admin-nav";
 import axios from "axios";
 import {
   Trash2,
@@ -112,15 +113,11 @@ const UsersPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">
       <ToastContainer />
-
-      {/* Header */}
-      <div className="bg-white/10 backdrop-blur-sm border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-white">User Management</h1>
-        </div>
-      </div>
+      <AdminNav />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header */}
+        <h2 className="text-white text-4xl font-bold mb-2">User Dashboard</h2>
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-xl shadow-lg p-6">
