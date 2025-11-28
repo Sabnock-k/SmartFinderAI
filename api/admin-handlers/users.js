@@ -16,10 +16,10 @@ router.get("/", async (req, res) => {
         u.points,
         u.is_admin,
         u.created_at,
-        COUNT(DISTINCT fi.found_item_id) as items_reported,
-        COUNT(DISTINCT rr.redemption_id) as total_redemptions,
-        COUNT(DISTINCT CASE WHEN fi.reunited = true THEN fi.found_item_id END) as items_reunited,
-        COUNT(DISTINCT cr.claim_request_id) as total_claims
+        CAST(COUNT(DISTINCT fi.found_item_id) AS INTEGER) as items_reported,
+        CAST(COUNT(DISTINCT rr.redemption_id) AS INTEGER) as total_redemptions,
+        CAST(COUNT(DISTINCT CASE WHEN fi.reunited = true THEN fi.found_item_id END) AS INTEGER) as items_reunited,
+        CAST(COUNT(DISTINCT cr.claim_request_id) AS INTEGER) as total_claims
       FROM users u
       LEFT JOIN found_items fi ON u.user_id = fi.reported_by_user_id
       LEFT JOIN reward_redemptions rr ON u.user_id = rr.user_id
@@ -53,9 +53,9 @@ router.get("/:id", async (req, res) => {
         u.points,
         u.is_admin,
         u.created_at,
-        COUNT(DISTINCT fi.found_item_id) as items_reported,
-        COUNT(DISTINCT rr.redemption_id) as total_redemptions,
-        COUNT(DISTINCT CASE WHEN fi.reunited = true THEN fi.found_item_id END) as items_reunited
+        CAST(COUNT(DISTINCT fi.found_item_id) AS INTEGER) as items_reported,
+        CAST(COUNT(DISTINCT rr.redemption_id) AS INTEGER) as total_redemptions,
+        CAST(COUNT(DISTINCT CASE WHEN fi.reunited = true THEN fi.found_item_id END) AS INTEGER) as items_reunited
       FROM users u
       LEFT JOIN found_items fi ON u.user_id = fi.reported_by_user_id
       LEFT JOIN reward_redemptions rr ON u.user_id = rr.user_id
@@ -68,6 +68,8 @@ router.get("/:id", async (req, res) => {
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    const userData = userResult.rows[0];
 
     // Get user's recent items
     const itemsResult = await pool.query(
@@ -108,36 +110,17 @@ router.get("/:id", async (req, res) => {
     );
 
     res.json({
-      user: userResult.rows[0],
+      user: {
+        ...userData,
+        items_reported: parseInt(userData.items_reported) || 0,
+        total_redemptions: parseInt(userData.total_redemptions) || 0,
+        items_reunited: parseInt(userData.items_reunited) || 0,
+      },
       recentItems: itemsResult.rows,
       recentRedemptions: redemptionsResult.rows,
     });
   } catch (error) {
     console.error("Error fetching user details:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// GET /api/admin/users/stats/summary - Get overall user statistics
-router.get("/stats/summary", async (req, res) => {
-  try {
-    const stats = await pool.query(`
-      SELECT 
-        COUNT(DISTINCT u.user_id) as total_users,
-        SUM(u.points) as total_points,
-        COUNT(DISTINCT fi.found_item_id) as total_items_reported,
-        COUNT(DISTINCT rr.redemption_id) as total_redemptions,
-        COUNT(DISTINCT CASE WHEN fi.reunited = true THEN fi.found_item_id END) as total_items_reunited,
-        AVG(u.points)::INTEGER as avg_points_per_user
-      FROM users u
-      LEFT JOIN found_items fi ON u.user_id = fi.reported_by_user_id
-      LEFT JOIN reward_redemptions rr ON u.user_id = rr.user_id
-      WHERE u.is_admin = false;
-    `);
-
-    res.json(stats.rows[0]);
-  } catch (error) {
-    console.error("Error fetching user statistics:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
