@@ -9,6 +9,7 @@ import {
   Tag,
   AlertCircle,
   X,
+  ImageOff,
 } from "lucide-react";
 
 const SearchPage = () => {
@@ -16,11 +17,13 @@ const SearchPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [imageError, setImageError] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [toast, setToast] = useState(null);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [claimedItems, setClaimedItems] = useState(new Set());
 
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -73,6 +76,12 @@ const SearchPage = () => {
       return;
     }
 
+    // Check if already claimed by this user
+    if (claimedItems.has(item.item_id)) {
+      showToast("You have already claimed this item", "warning");
+      return;
+    }
+
     setIsClaiming(true);
     try {
       const response = await axios.post(`${API_BASE}/api/claim-item`, {
@@ -89,7 +98,26 @@ const SearchPage = () => {
 
       showToast("Claim attempt submitted! Founder notified.", "success");
 
-      // Update local item status
+      // Mark item as claimed
+      setClaimedItems((prev) => new Set(prev).add(item.item_id));
+
+      // Update search results
+      setSearchResults((prevResults) =>
+        prevResults.map((resultItem) =>
+          resultItem.item_id === item.item_id
+            ? {
+                ...resultItem,
+                status: "attempting to claim",
+                claimer_name: user.full_name,
+                founder_name: founder.full_name,
+                founder_email: founder.email,
+                founder_facebook: founder.facebook_account_link,
+              }
+            : resultItem
+        )
+      );
+
+      // Update selected item with founder details
       setSelectedItem({
         ...item,
         status: "attempting to claim",
@@ -120,6 +148,14 @@ const SearchPage = () => {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const isItemClaimed = (item) => {
+    return (
+      claimedItems.has(item.item_id) ||
+      item.claimer_name ||
+      item.status === "attempting to claim"
+    );
   };
 
   if (!loggedIn) {
@@ -170,9 +206,47 @@ const SearchPage = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
             Search Lost Items
           </h2>
-          <p className="text-white/90 text-sm md:text-base">
+          <p className="text-white/90 text-sm md:text-base mb-4">
             AI-powered search to help you find your lost belongings
           </p>
+
+          {/* Search Tips */}
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 text-left">
+            <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5" />
+              Search Tips for Best Results
+            </h3>
+            <ul className="text-white/90 text-sm space-y-1.5">
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-300 mt-0.5">•</span>
+                <span>
+                  Be specific about the item:{" "}
+                  <span className="text-yellow-200 font-medium">
+                    "blue Nike backpack"
+                  </span>{" "}
+                  instead of just "backpack"
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-300 mt-0.5">•</span>
+                <span>
+                  Include location details:{" "}
+                  <span className="text-yellow-200 font-medium">
+                    "red water bottle in 5th floor cafeteria"
+                  </span>
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-300 mt-0.5">•</span>
+                <span>
+                  Mention distinctive features:{" "}
+                  <span className="text-yellow-200 font-medium">
+                    "black wallet with leather strap"
+                  </span>
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -242,13 +316,17 @@ const SearchPage = () => {
                   onClick={() => setSelectedItem(item)}
                 >
                   <div className="flex flex-col md:flex-row gap-6">
-                    {item.image_url && (
-                      <div className="flex-shrink-0">
-                        <img
-                          src={item.image_url}
-                          alt={item.description}
-                          className="w-full md:w-48 h-48 object-cover rounded-xl border-2 border-blue-100"
-                        />
+                    {item.image_url && !imageError ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.description}
+                        onError={() => setImageError(true)}
+                        className="w-full md:w-48 h-48 object-cover rounded-xl border-2 border-blue-100"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-gray-500 bg-gray-200 w-full md:w-48 h-48 rounded-xl">
+                        <ImageOff className="w-12 h-12 mb-1" />
+                        <p className="text-sm">No Image Available</p>
                       </div>
                     )}
 
@@ -298,8 +376,8 @@ const SearchPage = () => {
                             <span
                               className={`px-3 py-1 rounded-full text-xs font-semibold ${
                                 item.status === "available"
-                                  ? "bg-green-100 text-green-1000"
-                                  : "bg-red-100 text-red-1000"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800"
                               }`}
                             >
                               {item.status}
@@ -339,12 +417,18 @@ const SearchPage = () => {
                 </button>
               </div>
 
-              {selectedItem.image_url && (
+              {selectedItem.image_url && !imageError ? (
                 <img
                   src={selectedItem.image_url}
                   alt={selectedItem.description}
-                  className="w-full h-64 object-cover rounded-xl mb-4 border-2 border-blue-100"
+                  onError={() => setImageError(true)}
+                  className="w-full h-64 object-cover rounded-xl border-2 border-blue-100 mb-4"
                 />
+              ) : (
+                <div className="h-48 w-full bg-gray-200 flex flex-col items-center justify-center text-gray-500 rounded-xl mb-4">
+                  <ImageOff className="w-12 h-12 mb-1" />
+                  <p className="text-sm">No Image Available</p>
+                </div>
               )}
 
               <div className="space-y-4">
@@ -395,7 +479,7 @@ const SearchPage = () => {
 
                 {/* Claim Button */}
                 <div className="pt-4 border-t border-gray-200">
-                  {!selectedItem.claimer_name ? (
+                  {!isItemClaimed(selectedItem) ? (
                     <button
                       onClick={() => handleClaimItem(selectedItem)}
                       disabled={isClaiming}
@@ -415,23 +499,31 @@ const SearchPage = () => {
                       <h4 className="font-semibold text-green-800 mb-2">
                         Founder Contact Details
                       </h4>
-                      <p>Name: {selectedItem.founder_name || "N/A"}</p>
-                      <p>Email: {selectedItem.founder_email || "N/A"}</p>
-                      <p>
-                        Facebook:{" "}
-                        {selectedItem.founder_facebook ? (
-                          <a
-                            href={selectedItem.founder_facebook}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline hover:text-blue-800"
-                          >
-                            View Profile
-                          </a>
-                        ) : (
-                          "N/A"
-                        )}
-                      </p>
+                      <div className="space-y-1 text-gray-700">
+                        <p>
+                          <span className="font-medium">Name:</span>{" "}
+                          {selectedItem.founder_name || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Email:</span>{" "}
+                          {selectedItem.founder_email || "N/A"}
+                        </p>
+                        <p>
+                          <span className="font-medium">Facebook:</span>{" "}
+                          {selectedItem.founder_facebook ? (
+                            <a
+                              href={selectedItem.founder_facebook}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 underline hover:text-blue-800"
+                            >
+                              View Profile
+                            </a>
+                          ) : (
+                            "N/A"
+                          )}
+                        </p>
+                      </div>
                     </div>
                   )}
                   <p className="text-xs text-gray-500 text-center mt-2">

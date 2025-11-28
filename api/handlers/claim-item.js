@@ -47,7 +47,7 @@ router.post("/", async (req, res) => {
     const itemDescription = itemResult.rows[0].description;
     const claimer = claimerResult.rows[0];
 
-    // 🔹 4. Create a clean, clickable notification
+    // Create a clean notification
     const message = `
       ${claimer.full_name} is attempting to claim your found item: 
       ${itemDescription}.
@@ -65,6 +65,45 @@ router.post("/", async (req, res) => {
   } catch (error) {
     console.error("Error processing claim:", error);
     res.status(500).json({ error: "Failed to process claim attempt" });
+  }
+});
+
+// PUT /api/claim-item/founder-reject
+router.put("/founder-reject", async (req, res) => {
+  const { itemId } = req.body;
+  try {
+    // notify claimer that founder rejected
+    const result = await pool.query(
+      `SELECT requested_by_user_id FROM claim_requests WHERE found_item_id = $1`,
+      [itemId]
+    );
+    if (result.rows.length > 0) {
+      const claimerId = result.rows[0].requested_by_user_id;
+      const message = `Your claim request for item has been rejected by the founder.`;
+      await pool.query(
+        `INSERT INTO notifications (recipient_user_id, found_item_id, message)
+         VALUES ($1, $2, $3)`,
+        [claimerId, itemId, message]
+      );
+    }
+
+    await pool.query(
+      `DELETE FROM claim_requests 
+       WHERE found_item_id = $1`,
+      [itemId]
+    );
+
+    await pool.query(
+      `UPDATE found_items 
+      SET status = 'available'
+      WHERE found_item_id = $1`,
+      [itemId]
+    );
+
+    res.json({ message: "Founder rejected claim" });
+  } catch (err) {
+    console.error("Error rejecting claim by founder:", err);
+    res.status(500).json({ error: "Failed to reject claim" });
   }
 });
 

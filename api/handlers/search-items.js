@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
         FROM claim_requests c
         WHERE c.found_item_id = f.found_item_id
         )
-      AND (1 - (embedding <=> $2)) >= 0.5
+      AND (1 - (embedding <=> $2)) >= 0.4
       ORDER BY embedding <=> $2
       LIMIT 10;
       `,
