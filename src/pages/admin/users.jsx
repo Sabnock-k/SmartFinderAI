@@ -323,7 +323,7 @@ const UsersTable = ({
               sortConfig={sortConfig}
               onSort={onSort}
             />
-            <th className="px-8 py-4 text-left text-sm font-semibold text-gray-700">
+            <th className="px-7 py-4 text-left text-sm font-semibold text-gray-700">
               Actions
             </th>
           </tr>
