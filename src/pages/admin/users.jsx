@@ -59,12 +59,13 @@ const UsersPage = () => {
       setDeleting(true);
       await axios.delete(`${API_BASE}/api/admin/users/${userId}`);
       setUsers(users.filter((u) => u.user_id !== userId));
+
+      setDeleteConfirm(null);
+      setSelectedUser(null);
       toast.success("Successfully Deleted User!", {
         position: "top-center",
         autoClose: 3000,
       });
-      setDeleteConfirm(null);
-      setSelectedUser(null);
     } catch (err) {
       console.error("Error deleting user:", err);
       toast.error(err.response?.data?.error || "Failed to delete user", {
