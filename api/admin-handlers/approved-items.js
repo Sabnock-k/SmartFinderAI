@@ -40,7 +40,7 @@ router.delete("/:id", async (req, res) => {
     // Create notification
     const message = `Your reported item has been deleted.`;
     await pool.query(
-      "INSERT INTO notifications (recipient_user_id, found_item_id, message) VALUES ($1, $2)",
+      "INSERT INTO notifications (recipient_user_id, found_item_id, message) VALUES ($1, $2, $3)",
       [userId, itemId, message]
     );
 
