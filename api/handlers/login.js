@@ -16,12 +16,12 @@ router.post("/", async (req, res) => {
   }
 
   if (identifier.length < 3 || identifier.length > 254) {
-    return res.status(400).json({ error: "Invalid username or email format." });
+    return res.status(400).json({ error: "Invalid username." });
   }
 
   try {
     const result = await pool.query(
-      `SELECT * FROM users WHERE LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($1) LIMIT 1`,
+      `SELECT * FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1`,
       [identifier]
     );
 
