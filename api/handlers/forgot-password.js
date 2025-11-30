@@ -17,9 +17,9 @@ router.post("/", async (req, res) => {
     // Check if user exists
     const result = await pool.query(
       `SELECT user_id, email, username, full_name 
-             FROM users 
-             WHERE LOWER(email) = LOWER($1) 
-             LIMIT 1`,
+      FROM users 
+      WHERE LOWER(email) = LOWER($1) 
+      LIMIT 1`,
       [email]
     );
 
@@ -43,8 +43,8 @@ router.post("/", async (req, res) => {
     // Store reset token in DB
     await pool.query(
       `UPDATE users 
-             SET reset_token = $1, reset_token_expires = NOW() + INTERVAL '1 hour' 
-             WHERE user_id = $2`,
+      SET reset_token = $1, reset_token_expires = NOW() + INTERVAL '1 hour' 
+      WHERE user_id = $2`,
       [resetToken, user.user_id]
     );
 
