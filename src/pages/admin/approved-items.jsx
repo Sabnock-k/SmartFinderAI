@@ -9,6 +9,7 @@ import {
   Filter,
   RefreshCw,
   AlertCircle,
+  AlertTriangle,
   Eye,
   X,
   Award,
@@ -25,8 +26,9 @@ const ApprovedItems = () => {
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [approvedItems, setApprovedItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [reunitingId, setReunitingId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [error, setError] = useState(null);
@@ -65,20 +67,13 @@ const ApprovedItems = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this item? This action cannot be undone."
-      )
-    ) {
-      return;
-    }
-
     try {
       setDeletingId(id);
       await axios.delete(`${API_BASE}/api/admin/approved-items/${id}`);
       setApprovedItems((prev) =>
         prev.filter((item) => item.found_item_id !== id)
       );
+      setDeleteConfirm(null);
       setSelectedItem(null);
       toast.success("Item deleted successfully", {
         position: "top-center",
@@ -388,7 +383,7 @@ const ApprovedItems = () => {
                   </button>
                 )}
               <button
-                onClick={() => handleDelete(item.found_item_id)}
+                onClick={() => setDeleteConfirm(item.found_item_id)}
                 disabled={deletingId === item.found_item_id}
                 className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -707,7 +702,7 @@ const ApprovedItems = () => {
                             View
                           </button>
                           <button
-                            onClick={() => handleDelete(item.found_item_id)}
+                            onClick={() => setDeleteConfirm(item.found_item_id)}
                             disabled={deletingId === item.found_item_id}
                             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                           >
@@ -737,6 +732,46 @@ const ApprovedItems = () => {
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 animate-fadeIn">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-red-100 p-2 rounded-full">
+                <AlertTriangle className="text-red-600" size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">
+                Delete Approved Item?
+              </h3>
+            </div>
+
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this approved item? This action
+              cannot be undone, and the user will receive a deletion
+              notification.
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                disabled={deletingId !== null}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => handleDelete(deleteConfirm)}
+                disabled={deletingId !== null}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {deletingId !== null ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

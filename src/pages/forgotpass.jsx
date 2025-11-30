@@ -49,10 +49,6 @@ function ForgotPassword() {
     }
   };
 
-  const handleBackToLogin = () => {
-    navigate("/login");
-  };
-
   const handleResendEmail = async () => {
     if (!email) return;
 
