@@ -29,11 +29,7 @@ const UsersPage = () => {
   // Modal states
   const [selectedUser, setSelectedUser] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [banUserConfirm, setBanUserConfirm] = useState(null);
-  const [unBanUserConfirm, setUnBanUserConfirm] = useState(null);
   const [deleting, setDeleting] = useState(false);
-  const [banning, setBanning] = useState(false);
-  const [unBanning, setUnBanning] = useState(false);
 
   // UI state
   const [searchTerm, setSearchTerm] = useState("");
@@ -64,50 +60,6 @@ const UsersPage = () => {
       setError(err.response?.data?.error || err.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleBanUser = async (userId) => {
-    try {
-      setBanning(true);
-      await axios.post(`${API_BASE}/api/admin/users/${userId}/ban`);
-      setUsers(users.filter((u) => u.user_id !== userId));
-      toast.success("Successfully banned user!", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    } catch (err) {
-      console.error("Error banning user:", err);
-      toast.error(err.response?.data?.error || "Failed to ban user", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    } finally {
-      setBanning(false);
-      setBanUserConfirm(null);
-      setSelectedUser(null);
-    }
-  };
-
-  const handleUnBanUser = async (userId) => {
-    try {
-      setUnBanning(true);
-      await axios.post(`${API_BASE}/api/admin/users/${userId}/unban`);
-      setUsers(users.filter((u) => u.user_id !== userId));
-      toast.success("Successfully unbanned user!", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    } catch (err) {
-      console.error("Error unbanning user:", err);
-      toast.error(err.response?.data?.error || "Failed to unban user", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    } finally {
-      setUnBanning(false);
-      setUnBanUserConfirm(null);
-      setSelectedUser(null);
     }
   };
 
@@ -246,8 +198,6 @@ const UsersPage = () => {
             sortConfig={sortConfig}
             onSort={handleSort}
             onUserClick={setSelectedUser}
-            onBanClick={setBanUserConfirm}
-            onUnBanClick={setUnBanUserConfirm}
             onDeleteClick={setDeleteConfirm}
           />
         )}
@@ -259,28 +209,6 @@ const UsersPage = () => {
           user={selectedUser}
           onClose={() => setSelectedUser(null)}
           getDaysActive={getDaysActive}
-        />
-      )}
-
-      {banUserConfirm && (
-        <ConfirmModal
-          title="Confirm Ban"
-          message="Are you sure you want to ban this user?"
-          confirmText={banning ? "Banning..." : "Ban"}
-          onConfirm={() => handleBanUser(banUserConfirm)}
-          onCancel={() => setBanUserConfirm(null)}
-          disabled={banning}
-        />
-      )}
-
-      {unBanUserConfirm && (
-        <ConfirmModal
-          title="Confirm Unban"
-          message="Are you sure you want to unban this user?"
-          confirmText={unBanning ? "Unbanning..." : "Unban"}
-          onConfirm={() => handleUnBanUser(unBanUserConfirm)}
-          onCancel={() => setUnBanUserConfirm(null)}
-          disabled={unBanning}
         />
       )}
 
@@ -355,8 +283,6 @@ const UsersTable = ({
   sortConfig,
   onSort,
   onUserClick,
-  onBanClick,
-  onUnBanClick,
   onDeleteClick,
 }) => (
   <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -431,28 +357,6 @@ const UsersTable = ({
                   : "N/A"}
               </td>
               <td className="px-6 py-4 text-sm">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onBanClick(u.user_id);
-                  }}
-                  className="px-2 text-red-600 hover:text-red-800 transition-colors"
-                  title="Ban user"
-                >
-                  <UserX size={18} />
-                </button>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUnBanClick(u.user_id);
-                  }}
-                  className="px-2 text-green-600 hover:text-green-800 transition-colors"
-                  title="Unban user"
-                >
-                  <UserX size={18} />
-                </button>
-
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
