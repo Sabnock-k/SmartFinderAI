@@ -239,6 +239,22 @@ const PostFound = () => {
               className="w-full p-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-blue-50"
               disabled={isLoading}
             />
+
+            {/* Profile Reminder */}
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-xs text-blue-800 text-center">
+                💡 <span className="font-semibold">Reminder:</span> Please
+                configure your profile first to set up your Facebook link for
+                easier communication.
+              </p>
+            </div>
+
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-xs text-blue-800 text-center">
+                💡 <span className="font-semibold">Reminder:</span> Please pick
+                a clear image of the found item to help identify it
+              </p>
+            </div>
           </div>
 
           {/* Right: Inputs Card */}
