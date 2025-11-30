@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbar.jsx";
+import { useNavigate } from "react-router-dom";
 import {
   Upload,
   Camera,
@@ -24,11 +25,19 @@ const PostFound = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null); // New state for the image file
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
       setLoggedIn(true);
+
+      // Check if user is admin
+      if (storedUser.is_admin === true) {
+        setLoggedIn(false);
+        navigate("/admin");
+      }
     }
   }, []);
 
@@ -90,7 +99,7 @@ const PostFound = () => {
       const filePath = `found-items/${fileName}`;
 
       const { data, error } = await supabase.storage
-        .from("images") // Replace with your Supabase bucket name
+        .from("images")
         .upload(filePath, imageFile, {
           cacheControl: "3600",
           upsert: false,
@@ -105,7 +114,6 @@ const PostFound = () => {
         return;
       }
 
-      // Get public URL
       const { data: publicUrlData } = supabase.storage
         .from("images")
         .getPublicUrl(filePath);
@@ -138,7 +146,11 @@ const PostFound = () => {
       setImageFile(null);
     } catch (err) {
       console.error(err);
-      toast.error("Error uploading found item. Please try again.", {
+      // Display the specific error message from backend
+      const errorMessage =
+        err.response?.data?.error ||
+        "Error uploading found item. Please try again.";
+      toast.error(errorMessage, {
         position: "top-center",
         autoClose: 3000,
       });
@@ -227,6 +239,22 @@ const PostFound = () => {
               className="w-full p-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-blue-50"
               disabled={isLoading}
             />
+
+            {/* Profile Reminder */}
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-xs text-blue-800 text-center">
+                💡 <span className="font-semibold">Reminder:</span> Please
+                configure your profile first to set up your Facebook link for
+                easier communication.
+              </p>
+            </div>
+
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-xs text-blue-800 text-center">
+                💡 <span className="font-semibold">Reminder:</span> Please pick
+                a clear image of the found item to help identify it
+              </p>
+            </div>
           </div>
 
           {/* Right: Inputs Card */}

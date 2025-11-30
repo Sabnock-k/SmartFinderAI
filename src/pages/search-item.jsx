@@ -28,10 +28,16 @@ const SearchPage = () => {
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
       setLoggedIn(true);
+
+      // Check if user is admin
+      if (storedUser.is_admin === true) {
+        setLoggedIn(false);
+        navigate("/admin");
+      }
     }
   }, []);
 
