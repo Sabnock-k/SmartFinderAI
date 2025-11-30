@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbar.jsx";
+import { useNavigate } from "react-router-dom";
 import {
   Upload,
   Camera,
@@ -23,6 +24,8 @@ const PostFound = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null); // New state for the image file
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -96,7 +99,7 @@ const PostFound = () => {
       const filePath = `found-items/${fileName}`;
 
       const { data, error } = await supabase.storage
-        .from("images") // Replace with your Supabase bucket name
+        .from("images")
         .upload(filePath, imageFile, {
           cacheControl: "3600",
           upsert: false,
@@ -111,7 +114,6 @@ const PostFound = () => {
         return;
       }
 
-      // Get public URL
       const { data: publicUrlData } = supabase.storage
         .from("images")
         .getPublicUrl(filePath);
@@ -144,7 +146,11 @@ const PostFound = () => {
       setImageFile(null);
     } catch (err) {
       console.error(err);
-      toast.error("Error uploading found item. Please try again.", {
+      // Display the specific error message from backend
+      const errorMessage =
+        err.response?.data?.error ||
+        "Error uploading found item. Please try again.";
+      toast.error(errorMessage, {
         position: "top-center",
         autoClose: 3000,
       });
