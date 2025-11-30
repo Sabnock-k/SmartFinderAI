@@ -35,12 +35,6 @@ const PostFound = () => {
         setLoggedIn(false);
         navigate("/admin");
       }
-
-      // check if user is banned
-      if (storedUser.is_active === false) {
-        setLoggedIn(false);
-        navigate("/banned");
-      }
     }
   }, []);
 
