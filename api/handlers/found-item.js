@@ -29,10 +29,19 @@ router.post("/", async (req, res) => {
       date_time_found,
     } = req.body;
 
-    if (!reported_by_user_id || !description || !date_time_found) {
+    // check if user has a facebook account
+    const userResult = await pool.query(
+      "SELECT facebook_account_link FROM users WHERE user_id = $1",
+      [reported_by_user_id]
+    );
+    const user = userResult.rows[0];
+    if (!user) {
+      return res.status(400).json({ error: "User not found." });
+    }
+
+    if (!user.facebook_account_link) {
       return res.status(400).json({
-        error:
-          "reported_by_user_id, description, and date_time_found are required",
+        error: "You must link your Facebook account to report found items.",
       });
     }
 
