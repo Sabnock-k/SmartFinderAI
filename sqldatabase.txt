@@ -4,6 +4,13 @@ postgresql pass: password
 CREATE DATABASE IF NOT EXISTS campusfinder_ai;
 USE campusfinder_ai;
 
+
+-- vector
+CREATE EXTENSION IF NOT EXISTS vector;
+ALTER TABLE found_items
+  ALTER COLUMN embedding TYPE vector(3072) USING embedding::vector;
+
+
 -- Table: users
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
