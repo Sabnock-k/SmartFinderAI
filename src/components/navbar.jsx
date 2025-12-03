@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react"; // Lucide icons for burger & close
+import { Menu, X, Bell, House } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -55,20 +55,36 @@ const Navbar = ({ user }) => {
               onClick={() => navigate("/home")}
               className="hover:text-indigo-600 transition-colors"
             >
-              Home
+              HOME
             </button>
+
             <button
               onClick={() => navigate("/items")}
               className="hover:text-indigo-600 transition-colors"
             >
-              Items
+              ITEMS
             </button>
             <button
               onClick={() => navigate("/rewards")}
               className="hover:text-indigo-600 transition-colors"
             >
-              Rewards
+              REWARDS
             </button>
+
+            <div className="relative inline-block">
+              <button
+                onClick={() => navigate("/notifications")}
+                className="hover:text-indigo-600 transition-colors flex items-center gap-2"
+              >
+                <Bell />
+              </button>
+
+              {notificationCount > 0 && (
+                <span className="absolute -top-2 -right-4 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                  {notificationCount}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Avatar + Dropdown */}
@@ -80,13 +96,6 @@ const Navbar = ({ user }) => {
               className="w-10 h-10 rounded-full cursor-pointer border-2 border-white/50"
               onClick={() => setDropdownOpen((s) => !s)}
             />
-
-            {/* Notification Badge */}
-            {notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-                {notificationCount}
-              </span>
-            )}
 
             {dropdownOpen && (
               <div

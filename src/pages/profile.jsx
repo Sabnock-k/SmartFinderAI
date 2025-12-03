@@ -33,9 +33,6 @@ const Profile = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({});
-  const [notifications, setNotifications] = useState([]);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,110 +47,6 @@ const Profile = () => {
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
   }, []);
-
-  // Fetch notifications when user is loaded or when switching to notifications tab
-  useEffect(() => {
-    if (user && activeTab === "notifications") {
-      fetchNotifications();
-    }
-  }, [user, activeTab]);
-
-  // Fetch notification count when user is loaded
-  useEffect(() => {
-    if (user) {
-      fetchNotificationCount();
-    }
-  }, [user]);
-
-  const fetchNotifications = async () => {
-    setNotificationsLoading(true);
-    try {
-      const response = await axios.get(
-        `${API_BASE}/api/notifications/${user.user_id}`
-      );
-      setNotifications(response.data.notifications);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-      toast.error("Failed to load notifications", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    } finally {
-      setNotificationsLoading(false);
-    }
-  };
-
-  const fetchNotificationCount = async () => {
-    try {
-      const response = await axios.get(
-        `${API_BASE}/api/notifications/${user.user_id}/count`
-      );
-      setNotificationCount(response.data.count);
-    } catch (error) {
-      console.error("Error fetching notification count:", error);
-    }
-  };
-
-  const handleDeleteNotification = async (notificationId) => {
-    try {
-      await axios.delete(`${API_BASE}/api/notifications/${notificationId}`);
-      setNotifications(
-        notifications.filter((n) => n.notification_id !== notificationId)
-      );
-      setNotificationCount((prev) => Math.max(0, prev - 1));
-      toast.success("Notification removed", {
-        position: "top-center",
-        autoClose: 2000,
-      });
-    } catch (error) {
-      console.error("Error deleting notification:", error);
-      toast.error("Failed to remove notification", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    }
-  };
-
-  const handleClearAllNotifications = async () => {
-    try {
-      await axios.delete(`${API_BASE}/api/notifications/clear/${user.user_id}`);
-      setNotifications([]);
-      setNotificationCount(0);
-      toast.success("All notifications cleared", {
-        position: "top-center",
-        autoClose: 2000,
-      });
-    } catch (error) {
-      console.error("Error clearing notifications:", error);
-      toast.error("Failed to clear notifications", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-    }
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMs = now - date;
-    const diffInMins = Math.floor(diffInMs / 60000);
-    const diffInHours = Math.floor(diffInMs / 3600000);
-    const diffInDays = Math.floor(diffInMs / 86400000);
-
-    if (diffInMins < 1) return "Just now";
-    if (diffInMins < 60)
-      return `${diffInMins} min${diffInMins > 1 ? "s" : ""} ago`;
-    if (diffInHours < 24)
-      return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
-    if (diffInDays < 7)
-      return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
-
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
-    });
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -299,12 +192,6 @@ const Profile = () => {
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl overflow-hidden md:sticky md:top-20">
               {[
                 { id: "profile", label: "Profile", icon: User },
-                {
-                  id: "notifications",
-                  label: "Notifications",
-                  icon: Bell,
-                  badge: notificationCount,
-                },
                 { id: "security", label: "Security", icon: Lock },
               ].map(({ id, label, icon: Icon, badge }) => (
                 <button
@@ -440,133 +327,6 @@ const Profile = () => {
                     </div>
                   )}
                 </div>
-              </div>
-            )}
-
-            {/* Notifications Tab */}
-            {activeTab === "notifications" && (
-              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 sm:p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-white">
-                    Your Notifications
-                  </h2>
-                  {notifications.length > 0 && (
-                    <button
-                      onClick={handleClearAllNotifications}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm flex items-center gap-2"
-                    >
-                      <Trash2 size={16} />
-                      Clear All
-                    </button>
-                  )}
-                </div>
-
-                {notificationsLoading ? (
-                  <div className="flex justify-center items-center py-12">
-                    <ClipLoader size={40} color="#fff" />
-                  </div>
-                ) : notifications.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Bell
-                      size={64}
-                      className="mx-auto text-blue-300 mb-4 opacity-50"
-                    />
-                    <p className="text-blue-100 text-lg">
-                      No notifications yet.
-                    </p>
-                    <p className="text-blue-200 text-sm mt-2">
-                      You'll be notified when someone finds an item matching
-                      your lost items.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.notification_id}
-                        className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition duration-300 ease-in-out shadow-sm"
-                      >
-                        <div className="flex gap-4">
-                          {/* Item Image */}
-                          {notification.item_image && (
-                            <div className="flex-shrink-0">
-                              <img
-                                src={notification.item_image}
-                                alt="Item"
-                                className="w-16 h-16 rounded-lg object-cover border border-white/20"
-                              />
-                            </div>
-                          )}
-
-                          {/* Notification Content */}
-                          <div className="flex-1 min-w-0">
-                            {/* Message */}
-                            <p className="text-white mb-2 leading-relaxed">
-                              {notification.message
-                                .replace(/found/i, "📦 Found")
-                                .replace(/claimed/i, "🤝 Claimed")
-                                .replace(/approved/i, "✅ Approved")
-                                .replace(/rejected/i, "❌ Rejected")}
-                            </p>
-
-                            {/* Extra Info */}
-                            <div className="space-y-1 text-sm text-blue-200">
-                              {notification.item_description && (
-                                <div className="flex items-center gap-2">
-                                  <Package size={14} />
-                                  <span className="truncate">
-                                    {notification.item_description}
-                                  </span>
-                                </div>
-                              )}
-                              {notification.location && (
-                                <div className="flex items-center gap-2">
-                                  <MapPin size={14} />
-                                  <span>{notification.location}</span>
-                                </div>
-                              )}
-                              {notification.date_found && (
-                                <div className="flex items-center gap-2">
-                                  <Calendar size={14} />
-                                  <span>
-                                    {new Date(
-                                      notification.date_found
-                                    ).toLocaleDateString()}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Footer Actions */}
-                            <div className="flex items-center justify-between mt-4">
-                              <span className="text-xs text-blue-300 italic">
-                                {formatDate(notification.created_at)}
-                              </span>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => handleViewItem()}
-                                  className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition"
-                                >
-                                  View Item
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    handleDeleteNotification(
-                                      notification.notification_id
-                                    )
-                                  }
-                                  className="p-1.5 text-red-400 hover:text-red-300 transition"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             )}
 

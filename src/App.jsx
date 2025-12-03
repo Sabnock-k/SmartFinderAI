@@ -8,6 +8,7 @@ const Login = React.lazy(() => import("./pages/login.jsx"));
 const Homepage = React.lazy(() => import("./pages/homepage.jsx"));
 const Items = React.lazy(() => import("./pages/items.jsx"));
 const RewardsPage = React.lazy(() => import("./pages/rewards.jsx"));
+const NotificationsPage = React.lazy(() => import("./pages/notification.jsx"));
 const Profile = React.lazy(() => import("./pages/profile.jsx"));
 const Register = React.lazy(() => import("./pages/register.jsx"));
 const ForgotPassword = React.lazy(() => import("./pages/forgotpass.jsx"));
@@ -52,6 +53,7 @@ function App() {
           <Route path="/home" element={<Homepage />} />
           <Route path="/rewards" element={<RewardsPage />} />
           <Route path="/items" element={<Items />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/post-found" element={<PostItem />} />
           <Route path="/search-item" element={<SearchItem />} />
