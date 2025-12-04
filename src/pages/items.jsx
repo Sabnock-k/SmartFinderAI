@@ -438,7 +438,7 @@ const Items = () => {
                     >
                       {/* Image */}
                       <div className="relative">
-                        {!imageErrors[itemId] ? (
+                        {item.image_url && !imageErrors[itemId] ? (
                           <img
                             src={item.image_url}
                             alt={item.description}
