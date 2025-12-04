@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/navbar";
+import QRModal from "../components/QRmodal";
 import {
   Gift,
   Award,
@@ -23,6 +24,13 @@ const RewardsPage = () => {
   const [userPoints, setUserPoints] = useState(0);
   const [rewardsCatalog, setRewardsCatalog] = useState([]);
   const [redeemedRewards, setRedeemedRewards] = useState([]);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedQR, setSelectedQR] = useState({
+    title: "",
+    description: "",
+    qr_url: "",
+  });
+
   const [redeemAnimation, setRedeemAnimation] = useState(null);
   const [pointsPulse, setPointsPulse] = useState(false);
   const [activeTab, setActiveTab] = useState("available"); // "available" or "redeemed"
@@ -191,6 +199,21 @@ const RewardsPage = () => {
             <p className="text-gray-500 text-xs">
               Redeemed on: {new Date(reward.redeemed_at).toLocaleDateString()}
             </p>
+
+            {/* Show QR Button */}
+            <button
+              onClick={() => {
+                setSelectedQR({
+                  title: reward.title,
+                  description: reward.description,
+                  qr_url: reward.qr_url,
+                });
+                setShowQRModal(true);
+              }}
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              View QR Code
+            </button>
           </div>
         ))}
       </div>
@@ -315,6 +338,14 @@ const RewardsPage = () => {
         ) : (
           renderRedeemedRewards()
         )}
+
+        <QRModal
+          isOpen={showQRModal}
+          onClose={() => setShowQRModal(false)}
+          title={selectedQR.title}
+          description={selectedQR.description}
+          qrUrl={selectedQR.qr_url}
+        />
       </main>
     </div>
   );
