@@ -85,15 +85,18 @@ function ResetPassword() {
     setError("");
     setMessage("");
 
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      setError(passwordError);
-      return;
-    }
-
     // Validate password match
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    // Validate password strength
+    if (passwordStrength === "weak" || passwordStrength === "") {
+      setError(
+        "Password is too weak. Please use at least 8 characters with uppercase, lowercase, number, and special character."
+      );
       setLoading(false);
       return;
     }
