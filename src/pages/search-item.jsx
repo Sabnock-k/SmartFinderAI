@@ -216,6 +216,12 @@ const SearchPage = () => {
             AI-powered search to help you find your lost belongings
           </p>
 
+          {/* Extra note about NLP */}
+          <p className="text-white/80 text-xs md:text-sm mb-4 italic">
+            This uses NLP (Natural Language Processing). Just talk casually to
+            our AI and find your item.
+          </p>
+
           {/* Search Tips */}
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 text-left">
             <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
@@ -228,7 +234,7 @@ const SearchPage = () => {
                 <span>
                   Be specific about the item:{" "}
                   <span className="text-yellow-200 font-medium">
-                    "blue Nike backpack"
+                    "I lost my blue Nike backpack"
                   </span>{" "}
                   instead of just "backpack"
                 </span>
@@ -238,7 +244,7 @@ const SearchPage = () => {
                 <span>
                   Include location details:{" "}
                   <span className="text-yellow-200 font-medium">
-                    "red water bottle in 5th floor cafeteria"
+                    "I lost my red water bottle in 5th floor cafeteria"
                   </span>
                 </span>
               </li>
@@ -247,7 +253,7 @@ const SearchPage = () => {
                 <span>
                   Mention distinctive features:{" "}
                   <span className="text-yellow-200 font-medium">
-                    "black wallet with leather strap"
+                    "I lost my black wallet with leather strap"
                   </span>
                 </span>
               </li>
