@@ -32,6 +32,10 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState("");
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
 
@@ -80,66 +84,95 @@ const Profile = () => {
         autoClose: 3000,
       });
     } catch (error) {
-      console.error("Error updating profile:", error.message);
-      toast.error("Failed to update profile", {
+      toast.error("Failed to update profile", error.response?.data?.error, {
         position: "top-center",
         autoClose: 3000,
       });
     }
   };
 
-  const [security, setSecurity] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+  const validatePassword = (pass) => {
+    const hasUpperCase = /[A-Z]/.test(pass);
+    const hasLowerCase = /[a-z]/.test(pass);
+    const hasNumber = /\d/.test(pass);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+    const isLongEnough = pass.length >= 8;
 
-  const handleSecurityChange = (e) => {
-    const { name, value } = e.target;
-    setSecurity({ ...security, [name]: value });
+    if (
+      isLongEnough &&
+      hasUpperCase &&
+      hasLowerCase &&
+      hasNumber &&
+      hasSpecialChar
+    ) {
+      return "strong";
+    } else if (
+      isLongEnough &&
+      ((hasUpperCase && hasLowerCase && hasNumber) ||
+        (hasUpperCase && hasLowerCase && hasSpecialChar))
+    ) {
+      return "medium";
+    } else if (pass.length >= 6) {
+      return "weak";
+    }
+    return "";
   };
 
-  const handlePasswordChange = async () => {
-    if (security.newPassword !== security.confirmPassword) {
-      toast.error("Passwords don't match!", {
-        position: "top-center",
-        autoClose: 5000,
-      });
-      return;
-    }
+  const handlePasswordChange = async (e) => {
+    const pass = e.target.value;
+    setNewPassword(pass);
+    setPasswordStrength(validatePassword(pass));
+  };
 
-    if (security.newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters!", {
-        position: "top-center",
-        autoClose: 5000,
-      });
-      return;
-    }
-
+  const handleNewPassSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
+
+    // Validate password match
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match", {
+        position: "top-center",
+        autoClose: 5000,
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Validate password strength
+    if (passwordStrength === "weak" || passwordStrength === "") {
+      toast.error(
+        "Password is too weak. Please use at least 8 characters with uppercase, lowercase, number, and special character.",
+        {
+          position: "top-center",
+          autoClose: 5000,
+        }
+      );
+      setLoading(false);
+      return;
+    }
+
     try {
       await axios.post(`${API_BASE}/api/update-password`, {
         user_id: user.user_id,
-        currentPassword: security.currentPassword,
-        newPassword: security.newPassword,
+        currentPassword: currentPassword,
+        newPassword: newPassword,
       });
       toast.success("Password changed successfully!", {
         position: "top-center",
         autoClose: 5000,
       });
-      setSecurity({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
     } catch (error) {
-      toast.error(error.response?.data?.error || "Failed to update password", {
+      toast.error(error.response?.data?.error, {
         position: "top-center",
         autoClose: 5000,
       });
     } finally {
       setLoading(false);
     }
+
+    setTimeout(() => {
+      navigate("/profile");
+    }, 2000);
   };
 
   const handleCancel = () => {
@@ -151,10 +184,6 @@ const Profile = () => {
     localStorage.removeItem("user");
     setLoggedIn(false);
     navigate("/login");
-  };
-
-  const handleViewItem = () => {
-    navigate(`/items`);
   };
 
   if (!loggedIn) {
@@ -350,8 +379,8 @@ const Profile = () => {
                       <input
                         type="password"
                         name="currentPassword"
-                        value={security.currentPassword}
-                        onChange={handleSecurityChange}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
                         className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition"
                         placeholder="Enter current password"
                       />
@@ -364,8 +393,8 @@ const Profile = () => {
                         <input
                           type={showPassword ? "text" : "password"}
                           name="newPassword"
-                          value={security.newPassword}
-                          onChange={handleSecurityChange}
+                          value={newPassword}
+                          onChange={handlePasswordChange}
                           className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition"
                           placeholder="Enter new password"
                         />
@@ -379,6 +408,109 @@ const Profile = () => {
                             <Eye size={20} />
                           )}
                         </button>
+
+                        {newPassword && (
+                          <div className="mt-2">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div
+                                className={`h-1 flex-1 rounded-full ${
+                                  passwordStrength === "weak"
+                                    ? "bg-red-500"
+                                    : passwordStrength === "medium"
+                                    ? "bg-yellow-500"
+                                    : passwordStrength === "strong"
+                                    ? "bg-green-500"
+                                    : "bg-gray-300"
+                                }`}
+                              ></div>
+                              <div
+                                className={`h-1 flex-1 rounded-full ${
+                                  passwordStrength === "medium" ||
+                                  passwordStrength === "strong"
+                                    ? passwordStrength === "medium"
+                                      ? "bg-yellow-500"
+                                      : "bg-green-500"
+                                    : "bg-gray-300"
+                                }`}
+                              ></div>
+                              <div
+                                className={`h-1 flex-1 rounded-full ${
+                                  passwordStrength === "strong"
+                                    ? "bg-green-500"
+                                    : "bg-gray-300"
+                                }`}
+                              ></div>
+                            </div>
+                            <p
+                              className={`text-xs ${
+                                passwordStrength === "weak"
+                                  ? "text-red-600"
+                                  : passwordStrength === "medium"
+                                  ? "text-yellow-600"
+                                  : "text-green-600"
+                              }`}
+                            >
+                              {passwordStrength === "weak" && "Weak password"}
+                              {passwordStrength === "medium" &&
+                                "Medium strength"}
+                              {passwordStrength === "strong" &&
+                                "Strong password"}
+                            </p>
+                            <ul className="mt-2 text-xs space-y-1">
+                              <li
+                                className={
+                                  newPassword.length >= 8
+                                    ? "text-green-600"
+                                    : "text-gray-500"
+                                }
+                              >
+                                {newPassword.length >= 8 ? "✓" : "○"} At least 8
+                                characters
+                              </li>
+                              <li
+                                className={
+                                  /[A-Z]/.test(newPassword)
+                                    ? "text-green-600"
+                                    : "text-gray-500"
+                                }
+                              >
+                                {/[A-Z]/.test(newPassword) ? "✓" : "○"} One
+                                uppercase letter
+                              </li>
+                              <li
+                                className={
+                                  /[a-z]/.test(newPassword)
+                                    ? "text-green-600"
+                                    : "text-gray-500"
+                                }
+                              >
+                                {/[a-z]/.test(newPassword) ? "✓" : "○"} One
+                                lowercase letter
+                              </li>
+                              <li
+                                className={
+                                  /\d/.test(newPassword)
+                                    ? "text-green-600"
+                                    : "text-gray-500"
+                                }
+                              >
+                                {/\d/.test(newPassword) ? "✓" : "○"} One number
+                              </li>
+                              <li
+                                className={
+                                  /[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
+                                    ? "text-green-600"
+                                    : "text-gray-500"
+                                }
+                              >
+                                {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
+                                  ? "✓"
+                                  : "○"}{" "}
+                                One special character
+                              </li>
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div>
@@ -389,8 +521,8 @@ const Profile = () => {
                         <input
                           type={showConfirmPassword ? "text" : "password"}
                           name="confirmPassword"
-                          value={security.confirmPassword}
-                          onChange={handleSecurityChange}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
                           className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition"
                           placeholder="Confirm new password"
                         />
@@ -410,7 +542,7 @@ const Profile = () => {
                     </div>
 
                     <button
-                      onClick={handlePasswordChange}
+                      onClick={handleNewPassSubmit}
                       className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
                       disabled={loading}
                     >

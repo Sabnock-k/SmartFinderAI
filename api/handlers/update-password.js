@@ -4,6 +4,41 @@ import pool from "../utils/db.js";
 
 const router = express.Router();
 
+// Password validation function
+const validatePassword = (newPassword) => {
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/.test(newPassword);
+  const hasLowerCase = /[a-z]/.test(newPassword);
+  const hasNumber = /\d/.test(newPassword);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+  const isLongEnough = newPassword.length >= minLength;
+
+  const errors = [];
+
+  if (!isLongEnough) {
+    errors.push("Password must be at least 8 characters long");
+  }
+  if (!hasUpperCase) {
+    errors.push("Password must contain at least one uppercase letter");
+  }
+  if (!hasLowerCase) {
+    errors.push("Password must contain at least one lowercase letter");
+  }
+  if (!hasNumber) {
+    errors.push("Password must contain at least one number");
+  }
+  if (!hasSpecialChar) {
+    errors.push(
+      'Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)'
+    );
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+};
+
 router.post("/", async (req, res) => {
   const { user_id, currentPassword, newPassword } = req.body;
 
@@ -13,6 +48,15 @@ router.post("/", async (req, res) => {
 
   if (!currentPassword || !newPassword) {
     return res.status(400).json({ error: "All fields are required" });
+  }
+
+  // Validate password strength
+  const passwordValidation = validatePassword(newPassword);
+  if (!passwordValidation.isValid) {
+    return res.status(400).json({
+      error: "Password does not meet requirements",
+      details: passwordValidation.errors,
+    });
   }
 
   try {

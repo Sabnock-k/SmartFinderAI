@@ -13,6 +13,8 @@ import {
   Filter,
   Search,
 } from "lucide-react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import { ToastContainer, toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 
@@ -35,6 +37,10 @@ const NotificationsPage = () => {
     } else {
       navigate("/login");
     }
+  }, []);
+
+  useEffect(() => {
+    AOS.init({ duration: 800, once: false });
   }, []);
 
   useEffect(() => {
@@ -63,9 +69,28 @@ const NotificationsPage = () => {
     let filtered = [...notifications];
 
     // Filter by type
-    if (filter !== "all") {
+    if (filter == "Attempts") {
+      // Filter specifically for messages containing both "attempting to claim" AND "returned"
       filtered = filtered.filter((n) =>
-        n.message.toLowerCase().includes(filter.toLowerCase())
+        n.message.toLowerCase().includes("attempting to claim")
+      );
+    }
+
+    if (filter == "Claimed/Returned") {
+      filtered = filtered.filter((n) =>
+        n.message.toLowerCase().includes("100")
+      );
+    }
+
+    if (filter == "Approved") {
+      filtered = filtered.filter((n) =>
+        n.message.toLowerCase().includes("approved")
+      );
+    }
+
+    if (filter == "Rejected") {
+      filtered = filtered.filter((n) =>
+        n.message.toLowerCase().includes("rejected")
       );
     }
 
@@ -223,21 +248,25 @@ const NotificationsPage = () => {
               />
             </div>
             <div className="flex gap-2">
-              {["all", "found", "claimed", "approved", "rejected"].map(
-                (filterType) => (
-                  <button
-                    key={filterType}
-                    onClick={() => setFilter(filterType)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                      filter === filterType
-                        ? "bg-blue-600 text-white"
-                        : "bg-white/10 text-blue-200 hover:bg-white/20"
-                    }`}
-                  >
-                    {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
-                  </button>
-                )
-              )}
+              {[
+                "All",
+                "Attempts",
+                "Claimed/Returned",
+                "Approved",
+                "Rejected",
+              ].map((filterType) => (
+                <button
+                  key={filterType}
+                  onClick={() => setFilter(filterType)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    filter === filterType
+                      ? "bg-blue-600 text-white"
+                      : "bg-white/10 text-blue-200 hover:bg-white/20"
+                  }`}
+                >
+                  {filterType}
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -270,8 +299,8 @@ const NotificationsPage = () => {
             {filteredNotifications.map((notification, index) => (
               <div
                 key={notification.notification_id}
-                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 transform hover:scale-[1.01] animate-fadeIn"
-                style={{ animationDelay: `${index * 50}ms` }}
+                className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 transform hover:scale-[1.01]"
+                data-aos="fade-up"
               >
                 <div className="flex gap-4">
                   {/* Icon */}
@@ -380,23 +409,6 @@ const NotificationsPage = () => {
           </div>
         )}
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.4s ease-out forwards;
-          opacity: 0;
-        }
-      `}</style>
     </div>
   );
 };
