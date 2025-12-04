@@ -125,13 +125,6 @@ const Navbar = ({ user }) => {
                 </div>
                 <hr className="border-gray-200" />
                 <button
-                  onClick={() => navigate("/help")}
-                  className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  Help & Support
-                </button>
-                <hr className="border-gray-200" />
-                <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-3 text-sm text-red-500 font-medium hover:bg-red-50 transition-colors"
                 >
