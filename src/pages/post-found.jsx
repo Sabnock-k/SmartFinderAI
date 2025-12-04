@@ -289,6 +289,7 @@ const PostFound = () => {
                 value={formData.category}
                 onChange={handleChange}
                 className="w-full p-3 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-blue-50"
+                required
               >
                 <option value="">Select a category</option>
                 {categories.map((cat) => (

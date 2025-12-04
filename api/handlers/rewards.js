@@ -23,7 +23,7 @@ router.get("/redeemed-rewards/:userId", async (req, res) => {
   try {
     const result = await pool.query(
       `
-      SELECT rr.redemption_id, rr.redeemed_at, rc.title, rc.description, rc.points_cost
+      SELECT rr.redemption_id, rr.redeemed_at, rc.title, rc.description, rc.points_cost, rc.qr_url
       FROM reward_redemptions rr
       JOIN rewards_catalog rc ON rr.reward_id = rc.reward_id
       WHERE rr.user_id = $1

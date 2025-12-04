@@ -46,14 +46,43 @@ function ResetPassword() {
   }, []);
 
   const validatePassword = (pass) => {
-    if (pass.length < 6) {
-      return "Password must be at least 6 characters long";
+    const hasUpperCase = /[A-Z]/.test(pass);
+    const hasLowerCase = /[a-z]/.test(pass);
+    const hasNumber = /\d/.test(pass);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+    const isLongEnough = pass.length >= 8;
+
+    if (
+      isLongEnough &&
+      hasUpperCase &&
+      hasLowerCase &&
+      hasNumber &&
+      hasSpecialChar
+    ) {
+      return "strong";
+    } else if (
+      isLongEnough &&
+      ((hasUpperCase && hasLowerCase && hasNumber) ||
+        (hasUpperCase && hasLowerCase && hasSpecialChar))
+    ) {
+      return "medium";
+    } else if (pass.length >= 6) {
+      return "weak";
     }
-    return null;
+    return "";
+  };
+
+  const handlePasswordChange = (e) => {
+    const pass = e.target.value;
+    setPassword(pass);
+    setPasswordStrength(validatePassword(pass));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+    setMessage("");
 
     const passwordError = validatePassword(password);
     if (passwordError) {
@@ -61,14 +90,12 @@ function ResetPassword() {
       return;
     }
 
+    // Validate password match
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      setLoading(false);
       return;
     }
-
-    setLoading(true);
-    setError("");
-    setMessage("");
 
     try {
       await axios.put(`${API_BASE}/api/forgot-password`, {
@@ -237,12 +264,110 @@ function ResetPassword() {
                     type="password"
                     placeholder="Enter new password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-800 focus:outline-none focus:border-[#3949ab] focus:bg-white transition-all duration-300"
                     required
                     minLength={6}
                     disabled={loading}
                   />
+                  {password && (
+                    <div className="mt-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div
+                          className={`h-1 flex-1 rounded-full ${
+                            passwordStrength === "weak"
+                              ? "bg-red-500"
+                              : passwordStrength === "medium"
+                              ? "bg-yellow-500"
+                              : passwordStrength === "strong"
+                              ? "bg-green-500"
+                              : "bg-gray-300"
+                          }`}
+                        ></div>
+                        <div
+                          className={`h-1 flex-1 rounded-full ${
+                            passwordStrength === "medium" ||
+                            passwordStrength === "strong"
+                              ? passwordStrength === "medium"
+                                ? "bg-yellow-500"
+                                : "bg-green-500"
+                              : "bg-gray-300"
+                          }`}
+                        ></div>
+                        <div
+                          className={`h-1 flex-1 rounded-full ${
+                            passwordStrength === "strong"
+                              ? "bg-green-500"
+                              : "bg-gray-300"
+                          }`}
+                        ></div>
+                      </div>
+                      <p
+                        className={`text-xs ${
+                          passwordStrength === "weak"
+                            ? "text-red-600"
+                            : passwordStrength === "medium"
+                            ? "text-yellow-600"
+                            : "text-green-600"
+                        }`}
+                      >
+                        {passwordStrength === "weak" && "Weak password"}
+                        {passwordStrength === "medium" && "Medium strength"}
+                        {passwordStrength === "strong" && "Strong password"}
+                      </p>
+                      <ul className="mt-2 text-xs space-y-1">
+                        <li
+                          className={
+                            password.length >= 8
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {password.length >= 8 ? "✓" : "○"} At least 8
+                          characters
+                        </li>
+                        <li
+                          className={
+                            /[A-Z]/.test(password)
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {/[A-Z]/.test(password) ? "✓" : "○"} One uppercase
+                          letter
+                        </li>
+                        <li
+                          className={
+                            /[a-z]/.test(password)
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {/[a-z]/.test(password) ? "✓" : "○"} One lowercase
+                          letter
+                        </li>
+                        <li
+                          className={
+                            /\d/.test(password)
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {/\d/.test(password) ? "✓" : "○"} One number
+                        </li>
+                        <li
+                          className={
+                            /[!@#$%^&*(),.?":{}|<>]/.test(password)
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {/[!@#$%^&*(),.?":{}|<>]/.test(password) ? "✓" : "○"}{" "}
+                          One special character
+                        </li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
                 <div>

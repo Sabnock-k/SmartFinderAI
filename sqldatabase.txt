@@ -102,6 +102,8 @@ CREATE TABLE rewards_catalog (
     description TEXT,
     points_cost INT NOT NULL,
     icon VARCHAR(50),
+    qr_data TEXT,
+    qr_url  TEXT,
     is_active BOOLEAN DEFAULT TRUE
 );
 
