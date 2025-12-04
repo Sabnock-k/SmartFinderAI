@@ -28,7 +28,7 @@ const Items = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [items, setItems] = useState([]);
   const [claimedItems, setClaimedItems] = useState([]);
-  const [imageError, setImageError] = useState(false);
+  const [imageErrors, setImageErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("reported");
 
@@ -438,11 +438,16 @@ const Items = () => {
                     >
                       {/* Image */}
                       <div className="relative">
-                        {imageError ? (
+                        {!imageErrors[itemId] ? (
                           <img
                             src={item.image_url}
                             alt={item.description}
-                            onError={() => setImageError(true)}
+                            onError={() =>
+                              setImageErrors((prev) => ({
+                                ...prev,
+                                [itemId]: true,
+                              }))
+                            }
                             className="h-56 w-full object-cover"
                           />
                         ) : (
