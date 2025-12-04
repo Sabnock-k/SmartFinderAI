@@ -65,7 +65,7 @@ router.post("/", async (req, res) => {
 
     // Email template
     const mailOptions = {
-      from: "CampusFind-AI",
+      from: "CampusFind-AI <" + process.env.EMAIL_USER + ">",
       to: user.email,
       subject: "CampusFind - Password Reset Request",
       html: `
