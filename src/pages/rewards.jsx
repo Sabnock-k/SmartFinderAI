@@ -11,6 +11,7 @@ import {
   Star,
   CheckCircle,
   Loader2,
+  Clock,
 } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -33,9 +34,18 @@ const RewardsPage = () => {
 
   const [redeemAnimation, setRedeemAnimation] = useState(null);
   const [pointsPulse, setPointsPulse] = useState(false);
-  const [activeTab, setActiveTab] = useState("available"); // "available" or "redeemed"
-
+  const [activeTab, setActiveTab] = useState("available");
   const [pointsLoading, setPointsLoading] = useState(true);
+
+  // Track rewards currently being redeemed to prevent spam
+  const [redeeming, setRedeeming] = useState(new Set());
+
+  // NEW: Track cooldowns for rewards (reward_id -> timestamp when it can be redeemed again)
+  const [rewardCooldowns, setRewardCooldowns] = useState({});
+
+  // Cooldown duration in milliseconds (2 seconds to prevent backend spam)
+  // You can adjust this value: 1 second = 1000, 5 seconds = 5000, 10 seconds = 10000
+  const COOLDOWN_DURATION = 2000; // 2 seconds
 
   // Icon mapping
   const rewardIcons = {
@@ -51,6 +61,59 @@ const RewardsPage = () => {
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
+  }, []);
+
+  // Load cooldowns from localStorage on mount
+  useEffect(() => {
+    if (user) {
+      const savedCooldowns = localStorage.getItem(
+        `reward_cooldowns_${user.user_id}`
+      );
+      if (savedCooldowns) {
+        const parsed = JSON.parse(savedCooldowns);
+        // Clean up expired cooldowns
+        const now = Date.now();
+        const activeCooldowns = {};
+        Object.entries(parsed).forEach(([rewardId, timestamp]) => {
+          if (timestamp > now) {
+            activeCooldowns[rewardId] = timestamp;
+          }
+        });
+        setRewardCooldowns(activeCooldowns);
+      }
+    }
+  }, [user]);
+
+  // Save cooldowns to localStorage whenever they change
+  useEffect(() => {
+    if (user && Object.keys(rewardCooldowns).length > 0) {
+      localStorage.setItem(
+        `reward_cooldowns_${user.user_id}`,
+        JSON.stringify(rewardCooldowns)
+      );
+    }
+  }, [rewardCooldowns, user]);
+
+  // Timer to update UI when cooldowns expire
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setRewardCooldowns((prev) => {
+        const updated = { ...prev };
+        let hasChanges = false;
+
+        Object.entries(updated).forEach(([rewardId, timestamp]) => {
+          if (timestamp <= now) {
+            delete updated[rewardId];
+            hasChanges = true;
+          }
+        });
+
+        return hasChanges ? updated : prev;
+      });
+    }, 1000); // Check every second
+
+    return () => clearInterval(interval);
   }, []);
 
   // Fetch rewards catalog
@@ -95,9 +158,64 @@ const RewardsPage = () => {
     );
   }, [user]);
 
-  // Redeem a reward with animation
+  // Helper function to format time remaining
+  const formatTimeRemaining = (timestamp) => {
+    const now = Date.now();
+    const diff = timestamp - now;
+
+    if (diff <= 0) return "Available now";
+
+    const seconds = Math.ceil(diff / 1000);
+
+    if (seconds < 60) {
+      return `${seconds}s`;
+    }
+
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    if (minutes < 60) {
+      return remainingSeconds > 0
+        ? `${minutes}m ${remainingSeconds}s`
+        : `${minutes}m`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    if (hours > 24) {
+      const days = Math.floor(hours / 24);
+      return `${days}d ${hours % 24}h`;
+    }
+    return `${hours}h ${remainingMinutes}m`;
+  };
+
+  // Redeem a reward with spam prevention and cooldown
   const handleRedeem = async (reward) => {
+    // Prevent spam - check if already redeeming this reward
+    if (redeeming.has(reward.reward_id)) {
+      return;
+    }
+
+    // Check cooldown
+    if (
+      rewardCooldowns[reward.reward_id] &&
+      rewardCooldowns[reward.reward_id] > Date.now()
+    ) {
+      const timeLeft = formatTimeRemaining(rewardCooldowns[reward.reward_id]);
+      return; // Silently prevent redemption during cooldown (UI already shows it)
+    }
+
+    // Check if user can afford
+    if (userPoints < reward.points_cost) {
+      alert("Not enough points to redeem this reward!");
+      return;
+    }
+
     try {
+      // Mark as redeeming
+      setRedeeming((prev) => new Set(prev).add(reward.reward_id));
+
       await axios.post(`${API_BASE}/api/rewards/redeem`, {
         user_id: user.user_id,
         reward_id: reward.reward_id,
@@ -110,34 +228,55 @@ const RewardsPage = () => {
       setTimeout(() => setPointsPulse(false), 500);
 
       setUserPoints((prev) => prev - reward.points_cost);
-      setRedeemedRewards((prev) => [
+
+      const newRedemption = {
+        ...reward,
+        redeemed_at: new Date().toISOString(),
+      };
+
+      setRedeemedRewards((prev) => [newRedemption, ...prev]);
+
+      // Set cooldown for this reward
+      const cooldownEnd = Date.now() + COOLDOWN_DURATION;
+      setRewardCooldowns((prev) => ({
         ...prev,
-        { ...reward, redeemed_at: new Date() },
-      ]);
+        [reward.reward_id]: cooldownEnd,
+      }));
     } catch (err) {
       console.error("Error redeeming reward:", err);
-      alert("Failed to redeem reward. Not enough points?");
+      alert(err.response?.data?.message || "Failed to redeem reward.");
+    } finally {
+      // Remove from redeeming set after a short delay
+      setTimeout(() => {
+        setRedeeming((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(reward.reward_id);
+          return newSet;
+        });
+      }, 1000);
     }
   };
 
   const renderAvailableRewards = () => (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       {rewardsCatalog.map((reward) => {
-        const isRedeemed = redeemedRewards.some(
-          (r) => r.reward_id === reward.reward_id
-        );
         const canAfford = userPoints >= reward.points_cost;
+        const isRedeeming = redeeming.has(reward.reward_id);
+        const cooldownEnd = rewardCooldowns[reward.reward_id];
+        const isOnCooldown = cooldownEnd && cooldownEnd > Date.now();
 
         return (
           <div
             key={reward.reward_id}
             className={`bg-white/90 p-6 rounded-xl shadow-lg border border-blue-100 transition-transform duration-300
               ${
-                canAfford && !isRedeemed ? "hover:scale-105 cursor-pointer" : ""
+                canAfford && !isOnCooldown && !isRedeeming
+                  ? "hover:scale-105 cursor-pointer"
+                  : ""
               }
               ${redeemAnimation === reward.reward_id ? "animate-bounce" : ""}
+              ${isRedeeming || isOnCooldown ? "opacity-70" : ""}
             `}
-            data-aos="zoom-in"
           >
             <div
               className={`w-16 h-16 rounded-full bg-gradient-to-r ${rewardColor} flex items-center justify-center text-white mb-4 shadow-md`}
@@ -153,20 +292,32 @@ const RewardsPage = () => {
                 <span className="font-bold">{reward.points_cost} pts</span>
               </div>
 
-              {isRedeemed ? (
-                <div className="flex items-center gap-1 text-green-600 animate-pulse">
-                  <CheckCircle className="w-5 h-5" /> Redeemed
+              {isOnCooldown ? (
+                <div className="flex flex-col items-end">
+                  <div className="flex items-center gap-1 text-orange-600 text-sm">
+                    <Clock className="w-4 h-4" />
+                    <span className="font-semibold">Cooldown</span>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {formatTimeRemaining(cooldownEnd)}
+                  </span>
+                </div>
+              ) : isRedeeming ? (
+                <div className="flex items-center gap-1 text-blue-600">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="text-sm">Processing...</span>
                 </div>
               ) : canAfford ? (
                 <button
                   onClick={() => handleRedeem(reward)}
-                  className="px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 transition-transform duration-150 hover:scale-105 active:scale-95"
+                  disabled={isRedeeming || isOnCooldown}
+                  className="px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 transition-transform duration-150 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Redeem
                 </button>
               ) : (
-                <span className="px-4 py-2 rounded-lg bg-gray-200 text-gray-500">
-                  Locked
+                <span className="px-4 py-2 rounded-lg bg-gray-200 text-gray-500 text-sm">
+                  Need {reward.points_cost - userPoints} more pts
                 </span>
               )}
             </div>
@@ -183,10 +334,11 @@ const RewardsPage = () => {
       </p>
     ) : (
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {redeemedRewards.map((reward) => (
+        {redeemedRewards.map((reward, index) => (
           <div
-            key={reward.reward_id}
+            key={`${reward.reward_id}-${index}`}
             className="bg-white/90 p-6 rounded-xl shadow-lg border border-blue-100 flex flex-col gap-2 transition-transform duration-300 hover:scale-105"
+            data-aos="fade-up"
           >
             <div className="flex items-center gap-2">
               <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
@@ -197,7 +349,8 @@ const RewardsPage = () => {
               {reward.points_cost} pts
             </p>
             <p className="text-gray-500 text-xs">
-              Redeemed on: {new Date(reward.redeemed_at).toLocaleDateString()}
+              Redeemed: {new Date(reward.redeemed_at).toLocaleDateString()} at{" "}
+              {new Date(reward.redeemed_at).toLocaleTimeString()}
             </p>
 
             {/* Show QR Button */}
@@ -210,7 +363,7 @@ const RewardsPage = () => {
                 });
                 setShowQRModal(true);
               }}
-              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               View QR Code
             </button>
@@ -325,7 +478,7 @@ const RewardsPage = () => {
             }`}
             onClick={() => setActiveTab("redeemed")}
           >
-            Redeemed Rewards
+            Redeemed Rewards ({redeemedRewards.length})
           </button>
         </div>
 
