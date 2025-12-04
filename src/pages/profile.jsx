@@ -171,7 +171,7 @@ const Profile = () => {
     }
 
     setTimeout(() => {
-      navigate("/profile");
+      window.location.reload();
     }, 2000);
   };
 
