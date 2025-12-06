@@ -501,6 +501,39 @@ const Items = () => {
                               </span>
                             </div>
                           )}
+
+                          {activeTab === "claimed" && (
+                            <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+                              <h4 className="font-semibold text-green-800 mb-2">
+                                Founder Contact Details
+                              </h4>
+                              <div className="space-y-1 text-gray-700">
+                                <p>
+                                  <span className="font-medium">Name:</span>{" "}
+                                  {item.founder_name || "N/A"}
+                                </p>
+                                <p>
+                                  <span className="font-medium">Email:</span>{" "}
+                                  {item.founder_email || "N/A"}
+                                </p>
+                                <p>
+                                  <span className="font-medium">Facebook:</span>{" "}
+                                  {item.founder_facebook ? (
+                                    <a
+                                      href={item.founder_facebook}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 underline hover:text-blue-800"
+                                    >
+                                      View Profile
+                                    </a>
+                                  ) : (
+                                    "N/A"
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         {/* Action Buttons */}
