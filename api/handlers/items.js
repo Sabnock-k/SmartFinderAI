@@ -43,9 +43,13 @@ router.get("/claimed-items/:userId", async (req, res) => {
         fi.location_description,
         fi.date_time_found,
         fi.reunited,
-        fi.status
+        fi.status,
+        u.full_name AS founder_name,
+        u.email AS founder_email,
+        u.facebook_account_link AS founder_facebook
       FROM claim_requests cr
       JOIN found_items fi ON cr.found_item_id = fi.found_item_id
+      JOIN users u ON fi.reported_by_user_id = u.user_id
       WHERE cr.requested_by_user_id = $1
     `,
       [userId]
