@@ -105,14 +105,6 @@ const Items = () => {
         icon: Package,
       };
     }
-    if (!item.is_approved) {
-      return {
-        text: "Pending Approval For Posting",
-        color: "text-yellow-600",
-        bgColor: "bg-yellow-50",
-        icon: Clock,
-      };
-    }
     if (item.claimer_confirmed && item.founder_confirmed) {
       return {
         text: "Waiting for Admin Confirmation",
@@ -123,13 +115,22 @@ const Items = () => {
     }
     if (
       item.status === "A person is attempting to claim" ||
-      item.status === "claimer confirmed"
+      item.status === "claimer confirmed" ||
+      item.status === "founder confirmed"
     ) {
       return {
         text: item.status,
         color: "text-orange-600",
         bgColor: "bg-orange-50",
         icon: AlertCircle,
+      };
+    }
+    if (!item.is_approved && !item.reunited) {
+      return {
+        text: "Pending Approval For Posting",
+        color: "text-yellow-600",
+        bgColor: "bg-yellow-50",
+        icon: Clock,
       };
     }
     return {
