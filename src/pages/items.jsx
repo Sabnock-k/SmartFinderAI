@@ -105,23 +105,32 @@ const Items = () => {
         icon: Package,
       };
     }
-    if (!item.is_approved && !item.reunited) {
+    if (item.claimer_confirmed && item.founder_confirmed) {
       return {
-        text: "Pending Approval",
-        color: "text-yellow-600",
-        bgColor: "bg-yellow-50",
-        icon: Clock,
+        text: "Waiting for Admin Confirmation",
+        color: "text-gray-600",
+        bgColor: "bg-gray-50",
+        icon: AlertCircle,
       };
     }
     if (
       item.status === "A person is attempting to claim" ||
-      item.status === "claimer confirmed"
+      item.status === "claimer confirmed" ||
+      item.status === "founder confirmed"
     ) {
       return {
         text: item.status,
         color: "text-orange-600",
         bgColor: "bg-orange-50",
         icon: AlertCircle,
+      };
+    }
+    if (!item.is_approved && !item.reunited) {
+      return {
+        text: "Pending Approval For Posting",
+        color: "text-yellow-600",
+        bgColor: "bg-yellow-50",
+        icon: Clock,
       };
     }
     return {
@@ -429,6 +438,24 @@ const Items = () => {
                   const StatusIcon = statusInfo.icon;
                   const itemId = item.found_item_id || item.claim_request_id;
 
+                  let contact = null;
+
+                  if (activeTab === "reported") {
+                    contact = {
+                      note: "Claimer",
+                      name: item.claimer_name,
+                      email: item.claimer_email,
+                      facebook: item.claimer_facebook,
+                    };
+                  } else if (activeTab === "claimed") {
+                    contact = {
+                      note: "Founder",
+                      name: item.founder_name,
+                      email: item.founder_email,
+                      facebook: item.founder_facebook,
+                    };
+                  }
+
                   return (
                     <div
                       key={itemId}
@@ -501,6 +528,46 @@ const Items = () => {
                               </span>
                             </div>
                           )}
+
+                          {statusInfo.text !== "Available" &&
+                            statusInfo.test !==
+                              "Pending Approval For Posting" &&
+                            contact && (
+                              <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+                                <h4 className="font-semibold text-green-800 mb-2">
+                                  {contact.note} Contact Details
+                                </h4>
+                                <div className="space-y-1 text-gray-700">
+                                  <p>
+                                    <span className="font-medium">Name:</span>{" "}
+                                    {contact.name || "N/A"}
+                                  </p>
+
+                                  <p>
+                                    <span className="font-medium">Email:</span>{" "}
+                                    {contact.email || "N/A"}
+                                  </p>
+
+                                  <p>
+                                    <span className="font-medium">
+                                      Facebook:
+                                    </span>{" "}
+                                    {contact.facebook ? (
+                                      <a
+                                        href={contact.facebook}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline hover:text-blue-800"
+                                      >
+                                        View Profile
+                                      </a>
+                                    ) : (
+                                      "N/A"
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
                         </div>
 
                         {/* Action Buttons */}
