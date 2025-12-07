@@ -530,7 +530,8 @@ const Items = () => {
                           )}
 
                           {statusInfo.text !== "Available" &&
-                            item.is_approved &&
+                            statusInfo.test !==
+                              "Pending Approval For Posting" &&
                             contact && (
                               <div className="bg-green-50 p-4 rounded-xl border border-green-200">
                                 <h4 className="font-semibold text-green-800 mb-2">
