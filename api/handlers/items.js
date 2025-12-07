@@ -25,7 +25,7 @@ router.get("/:user_id", async (req, res) => {
       ORDER BY 
         cr.founder_confirmed DESC,
         cr.claimer_confirmed DESC,
-        cr.admin_approved DESC,
+        cr.admin_approved DESC
       `,
       [user_id]
     );
