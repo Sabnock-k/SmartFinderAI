@@ -84,8 +84,39 @@ const PostFound = () => {
     // Do not upload yet, just preview and store file
   };
 
+  // Maximum allowed lengths
+  const MAX_DESCRIPTION_LENGTH = 200;
+  const MAX_LOCATION_LENGTH = 100;
+
+  // Validation function
+  const validateFormLengths = (data) => {
+    if (data.description.length > MAX_DESCRIPTION_LENGTH) {
+      toast.error(
+        `Description is too long. Maximum is ${MAX_DESCRIPTION_LENGTH} characters.`,
+        { position: "top-center", autoClose: 3000 }
+      );
+      return false;
+    }
+
+    if (data.location_description.length > MAX_LOCATION_LENGTH) {
+      toast.error(
+        `Location description is too long. Maximum is ${MAX_LOCATION_LENGTH} characters.`,
+        { position: "top-center", autoClose: 3000 }
+      );
+      return false;
+    }
+
+    return true; // all good
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate description & location lengths
+    if (!validateFormLengths(formData)) {
+      return; // Stop submission if invalid
+    }
+
     setIsLoading(true);
 
     let imageUrl = formData.image_url;
