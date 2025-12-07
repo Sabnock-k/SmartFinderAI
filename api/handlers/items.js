@@ -14,6 +14,7 @@ router.get("/:user_id", async (req, res) => {
         cr.founder_confirmed,
         cr.claimer_confirmed,
         cr.admin_approved,
+        cr.claim_request_id,
         u.full_name AS claimer_name,
         u.email AS claimer_email,
         u.facebook_account_link AS claimer_facebook
@@ -21,7 +22,10 @@ router.get("/:user_id", async (req, res) => {
       LEFT JOIN claim_requests AS cr ON fi.found_item_id = cr.found_item_id
       LEFT JOIN users AS u ON cr.requested_by_user_id = u.user_id
       WHERE fi.reported_by_user_id = $1 
-      ORDER BY fi.created_at DESC;
+      ORDER BY 
+        cr.founder_confirmed DESC,
+        cr.claimer_confirmed DESC,
+        cr.admin_approved DESC,
       `,
       [user_id]
     );
