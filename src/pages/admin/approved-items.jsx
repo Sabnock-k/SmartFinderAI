@@ -230,6 +230,15 @@ const ApprovedItems = () => {
 
   const ItemDetailModal = ({ item, onClose }) => {
     const itemStatus = getItemStatus(item);
+    const iso = item.date_time_found.replace(" ", "T");
+    const dateObj = new Date(iso);
+
+    const dateOnly = dateObj.toLocaleDateString("en-PH");
+    const timeOnly = dateObj.toLocaleTimeString("en-PH", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
 
     return (
       <div
@@ -303,17 +312,13 @@ const ApprovedItems = () => {
                   <label className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
                     Date Found
                   </label>
-                  <p className="text-lg text-gray-800 mt-1">
-                    {new Date(item.date_time_found).toLocaleDateString()}
-                  </p>
+                  <p className="text-lg text-gray-800 mt-1">{dateOnly}</p>
                 </div>
                 <div>
                   <label className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
                     Time Found
                   </label>
-                  <p className="text-lg text-gray-800 mt-1">
-                    {new Date(item.date_time_found).toLocaleTimeString()}
-                  </p>
+                  <p className="text-lg text-gray-800 mt-1">{timeOnly}</p>
                 </div>
               </div>
 
