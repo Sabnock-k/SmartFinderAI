@@ -9,6 +9,7 @@ router.get("/", async (req, res) => {
     const items = await pool.query(`
       SELECT 
         fi.*, 
+        TO_CHAR(fi.date_time_found, 'YYYY-MM-DD HH24:MI:SS') AS date_time_found,
         u.full_name,
         cr.founder_confirmed,
         cr.claimer_confirmed,
