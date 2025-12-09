@@ -7,7 +7,17 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const items = await pool.query(
-      "SELECT fi.*, u.full_name FROM found_items AS fi JOIN users AS u ON fi.reported_by_user_id = u.user_id WHERE is_approved = 'FALSE' ORDER BY fi.created_at DESC;"
+      `
+      SELECT 
+        fi.*, 
+        TO_CHAR(fi.date_time_found, 'YYYY-MM-DD HH24:MI:SS') AS date_time_found,
+        u.full_name 
+      FROM found_items AS fi 
+      JOIN users AS u 
+      ON fi.reported_by_user_id = u.user_id 
+      WHERE is_approved = 'FALSE' 
+      ORDER BY fi.created_at DESC;
+      `
     );
     res.json(items.rows);
   } catch (error) {

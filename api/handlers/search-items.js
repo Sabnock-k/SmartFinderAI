@@ -39,7 +39,7 @@ router.post("/", async (req, res) => {
         category,
         image_url,
         location_description,
-        date_time_found,
+        TO_CHAR(date_time_found, 'YYYY-MM-DD HH24:MI:SS') AS date_time_found,
         is_approved,
         status,
         1 - (embedding <=> $2) AS match_score
