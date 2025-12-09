@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar.jsx";
+import formatDate from "../components/date-format.jsx";
 import {
   Search,
   Loader,
@@ -142,18 +143,6 @@ const SearchPage = () => {
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleSearch();
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   };
 
   const isItemClaimed = (item) => {
@@ -372,7 +361,9 @@ const SearchPage = () => {
                         {item.date_time_found && (
                           <div className="flex items-center gap-2 text-gray-600">
                             <Calendar className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                            <span>{formatDate(item.date_time_found)}</span>
+                            <span>{`${formatDate(item.date_time_found).date}, ${
+                              formatDate(item.date_time_found).time
+                            }`}</span>
                           </div>
                         )}
 
@@ -484,7 +475,9 @@ const SearchPage = () => {
                       Date & Time Found
                     </label>
                     <p className="text-gray-800 mt-1">
-                      {formatDate(selectedItem.date_time_found)}
+                      {`${formatDate(selectedItem.date_time_found).date}, ${
+                        formatDate(selectedItem.date_time_found).time
+                      }`}
                     </p>
                   </div>
                 )}
