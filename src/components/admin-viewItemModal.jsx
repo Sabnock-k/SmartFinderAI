@@ -1,3 +1,4 @@
+import formatDate from "./date-format";
 import { X, Package, CheckCircle2, Check, Award } from "lucide-react";
 import { ClipLoader } from "react-spinners";
 
@@ -20,15 +21,8 @@ const ItemDetailModal = ({
 
   // Made this way kay ang vercel pango pango e convert ug UCT ang original time so di nalang mo gamit ug Date()
   // Brute force baby
-  const dateOnlyRaw = item.date_time_found.split(" ")[0];
-  const timeOnly = item.date_time_found.split(" ")[1];
-
-  const [year, month, day] = dateOnlyRaw.split("-");
-  const dateOnly = new Date(year, month - 1, day).toLocaleDateString("en-PH", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const dateOnly = formatDate(item.date_time_found).date;
+  const timeOnly = formatDate(item.date_time_found).time;
 
   const getItemStatus = (item) => {
     if (item.reunited || item.admin_approved) return "reunited";
@@ -168,9 +162,7 @@ const ItemDetailModal = ({
                 Reported On
               </label>
               <p className="text-lg text-gray-800 mt-1">
-                {mode === "approved"
-                  ? `${dateOnly}, ${timeOnly}`
-                  : new Date(item.created_at).toLocaleString()}
+                {`${dateOnly}, ${timeOnly}`}
               </p>
             </div>
 
