@@ -91,7 +91,7 @@ const Navbar = ({ user }) => {
           <div className="relative">
             <img
               ref={avatarRef}
-              src={user?.avatar || "https://avatar.iran.liara.run/public/50"}
+              src={user?.avatar || "https://placedog.net/640/480?random"}
               alt="Profile"
               className="w-10 h-10 rounded-full cursor-pointer border-2 border-white/50"
               onClick={() => setDropdownOpen((s) => !s)}
@@ -110,9 +110,7 @@ const Navbar = ({ user }) => {
                   }}
                 >
                   <img
-                    src={
-                      user?.avatar || "https://avatar.iran.liara.run/public/50"
-                    }
+                    src={user?.avatar || "https://placedog.net/640/480?random"}
                     alt="Profile"
                     className="w-12 h-12 rounded-full border border-gray-300"
                   />
