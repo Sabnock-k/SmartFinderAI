@@ -18,15 +18,6 @@ const AdminPanel = () => {
   }, [authChecked, user]);
 
   useEffect(() => {
-    // Protect admin panel — redirect if not admin or not logged in
-    if (user === null) return; // wait until user is loaded
-
-    if (!user.is_admin) {
-      navigate("/home");
-    }
-  }, [user, navigate]);
-
-  useEffect(() => {
     AOS.init({ duration: 700, once: true });
   }, []);
 

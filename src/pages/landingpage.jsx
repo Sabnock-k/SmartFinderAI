@@ -30,7 +30,7 @@ const FeatureCard = ({ icon, title, description, aosAnimation }) => (
 // Main App Component (Landing Page)
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { user, authChecked } = useAuth();
+  const { user, authChecked } = useAuth({ redirectToLogin: false });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // index to cycle through images
   const [imgIndex, setImgIndex] = useState(0);
