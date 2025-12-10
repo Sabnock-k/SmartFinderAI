@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminNav from "../../components/admin-nav";
 import useAuth from "../../../api/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   UserX,
