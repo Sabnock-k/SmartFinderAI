@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/navbar.jsx";
+import useAuth from "../../api/hooks/useAuth.js";
 import {
   Loader2,
   MapPin,
@@ -24,8 +25,7 @@ import "aos/dist/aos.css";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const Items = () => {
-  const [user, setUser] = useState(null);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const { user, authChecked } = useAuth();
   const [items, setItems] = useState([]);
   const [claimedItems, setClaimedItems] = useState([]);
   const [imageErrors, setImageErrors] = useState({});
@@ -44,21 +44,15 @@ const Items = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    AOS.init({ duration: 800, once: true });
-  }, []);
-
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-      setLoggedIn(true);
-
-      // Check if user is admin
-      if (storedUser.is_admin === true) {
-        setLoggedIn(false);
+    if (authChecked && user) {
+      if (user.is_admin === true) {
         navigate("/admin");
       }
     }
+  }, [authChecked, user]);
+
+  useEffect(() => {
+    AOS.init({ duration: 800, once: true });
   }, []);
 
   useEffect(() => {
@@ -221,16 +215,6 @@ const Items = () => {
       setClaimerLoadingId(null);
     }
   };
-
-  if (!loggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-800">
-        <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-          <p className="text-lg font-medium">Please login to view this page.</p>
-        </div>
-      </div>
-    );
-  }
 
   const currentItems =
     activeTab === "reported" ? filterItems(items) : filterItems(claimedItems);

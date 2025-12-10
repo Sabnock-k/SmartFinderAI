@@ -1,11 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
 import AdminNav from "../../components/admin-nav";
+import useAuth from "../../../api/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const SettingsPage = () => {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { user, authChecked } = useAuth();
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -15,9 +17,15 @@ const SettingsPage = () => {
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!user || user.is_admin !== true) {
-    window.location.href = "/home";
-  }
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authChecked && user) {
+      if (user.is_admin !== true) {
+        navigate("/home");
+      }
+    }
+  }, [authChecked, user]);
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;

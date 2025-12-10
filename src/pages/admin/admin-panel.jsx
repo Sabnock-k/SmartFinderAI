@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminNav from "../../components/admin-nav.jsx";
+import useAuth from "../../../api/hooks/useAuth.js";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user, authChecked } = useAuth();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
+    if (authChecked && user) {
+      if (user.is_admin !== true) {
+        navigate("/home");
+      }
     }
-  }, []);
+  }, [authChecked, user]);
 
   useEffect(() => {
     // Protect admin panel — redirect if not admin or not logged in

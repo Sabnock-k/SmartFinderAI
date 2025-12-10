@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNav from "../../components/admin-nav";
+import useAuth from "../../../api/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import {
   Users,
   Package,
@@ -98,23 +100,22 @@ const ProgressBar = ({ label, value, total, color = "blue" }) => {
 };
 
 const AnalyticsPage = () => {
-  const [user] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user") || "null");
-    } catch {
-      return null;
-    }
-  });
+  const { user, authChecked } = useAuth();
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (!user || user.is_admin !== true) {
-      window.location.href = "/home";
-      return;
-    }
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    if (authChecked && user) {
+      if (user.is_admin !== true) {
+        navigate("/home");
+      }
+    }
+  }, [authChecked, user]);
+
+  useEffect(() => {
     const fetchAnalytics = async () => {
       try {
         setLoading(true);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../api/hooks/useAuth.js";
 import axios from "axios";
 import {
   Bell,
@@ -21,7 +22,7 @@ import { ClipLoader } from "react-spinners";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const NotificationsPage = () => {
-  const [user, setUser] = useState(null);
+  const { user, authChecked } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [filteredNotifications, setFilteredNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,14 +31,13 @@ const NotificationsPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-      fetchNotifications(storedUser.user_id);
-    } else {
-      navigate("/login");
+    if (authChecked && user) {
+      if (user.is_admin === true) {
+        navigate("/admin");
+      }
+      fetchNotifications(user.user_id);
     }
-  }, []);
+  }, [authChecked, user]);
 
   useEffect(() => {
     AOS.init({ duration: 800, once: false });
@@ -182,6 +182,12 @@ const NotificationsPage = () => {
   const handleViewItem = () => {
     navigate("/items");
   };
+
+  // Wait until authentication check is complete
+  if (!authChecked) return null;
+
+  // If user is still null, userAuth already redirected
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab] relative overflow-hidden">

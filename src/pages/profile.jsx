@@ -1,22 +1,9 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/navbar.jsx";
+import useAuth from "../../api/hooks/useAuth.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  User,
-  Lock,
-  Bell,
-  LogOut,
-  Edit2,
-  Save,
-  X,
-  Eye,
-  EyeOff,
-  Trash2,
-  MapPin,
-  Calendar,
-  Package,
-} from "lucide-react";
+import { User, Lock, LogOut, Edit2, Save, X, Eye, EyeOff } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import AOS from "aos";
@@ -25,8 +12,7 @@ import "aos/dist/aos.css";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const { user, authChecked } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,17 +22,34 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordStrength, setPasswordStrength] = useState("");
-  const [formData, setFormData] = useState({});
+  // Initialize with empty strings instead of empty object
+  const [formData, setFormData] = useState({
+    username: "",
+    full_name: "",
+    email: "",
+    facebook_account_link: "",
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-      setFormData(storedUser);
-      setLoggedIn(true);
+    if (authChecked && user) {
+      if (user.is_admin === true) {
+        navigate("/admin");
+      }
     }
-  }, []);
+  }, [authChecked, user]);
+
+  // Initialize form data when user is loaded
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        username: user.username || "",
+        full_name: user.full_name || "",
+        email: user.email || "",
+        facebook_account_link: user.facebook_account_link || "",
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
@@ -59,35 +62,40 @@ const Profile = () => {
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const updatedUser = {
-      ...user,
-      username: formData.username,
-      full_name: formData.full_name,
-      email: formData.email,
-      facebook_account_link: formData.facebook_account_link,
-    };
-
-    setUser(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setIsEditing(false);
     try {
-      await axios.post(`${API_BASE}/api/update-profile`, {
+      const response = await axios.post(`${API_BASE}/api/update-profile`, {
         user_id: user.user_id,
         username: formData.username,
         full_name: formData.full_name,
         email: formData.email,
         facebook_account_link: formData.facebook_account_link,
       });
-      toast.success("Profile updated successfully!", {
+
+      // Update the token with new user data
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+
+      toast.success(response.data.message, {
         position: "top-center",
         autoClose: 3000,
       });
+
+      setIsEditing(false);
+
+      // Reload page to refresh JWT token with updated data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
-      toast.error("Failed to update profile", error.response?.data?.error, {
+      toast.error(error.response?.data?.error, {
         position: "top-center",
         autoClose: 3000,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,7 +136,6 @@ const Profile = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Validate password match
     if (newPassword !== confirmPassword) {
       toast.error("Passwords do not match", {
         position: "top-center",
@@ -138,7 +145,6 @@ const Profile = () => {
       return;
     }
 
-    // Validate password strength
     if (passwordStrength === "weak" || passwordStrength === "") {
       toast.error(
         "Password is too weak. Please use at least 8 characters with uppercase, lowercase, number, and special character.",
@@ -157,46 +163,41 @@ const Profile = () => {
         currentPassword: currentPassword,
         newPassword: newPassword,
       });
+
       toast.success("Password changed successfully!", {
         position: "top-center",
         autoClose: 5000,
       });
+
+      // Clear form
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordStrength("");
     } catch (error) {
-      toast.error(error.response?.data?.error, {
+      toast.error(error.response?.data?.error || "Failed to update password", {
         position: "top-center",
         autoClose: 5000,
       });
     } finally {
       setLoading(false);
     }
-
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
   };
 
   const handleCancel = () => {
-    setFormData(user);
+    setFormData({
+      username: user.username || "",
+      full_name: user.full_name || "",
+      email: user.email || "",
+      facebook_account_link: user.facebook_account_link || "",
+    });
     setIsEditing(false);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    setLoggedIn(false);
+    localStorage.removeItem("token");
     navigate("/login");
   };
-
-  if (!loggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-800">
-        <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-          <p className="text-lg font-medium">
-            Please login to view your profile.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab] relative overflow-hidden">
@@ -222,7 +223,7 @@ const Profile = () => {
               {[
                 { id: "profile", label: "Profile", icon: User },
                 { id: "security", label: "Security", icon: Lock },
-              ].map(({ id, label, icon: Icon, badge }) => (
+              ].map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
@@ -234,11 +235,6 @@ const Profile = () => {
                 >
                   <Icon size={20} />
                   <span className="font-medium">{label}</span>
-                  {badge > 0 && (
-                    <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                      {badge}
-                    </span>
-                  )}
                 </button>
               ))}
               <button
@@ -254,18 +250,20 @@ const Profile = () => {
           {/* Main Content */}
           <div className="md:col-span-2">
             <ToastContainer />
+
             {/* Profile Tab */}
             {activeTab === "profile" && (
               <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 sm:p-8">
                 <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/10">
                   <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
                     <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-3xl sm:text-5xl shadow-lg">
-                      {user?.avatar || user?.username?.charAt(0).toUpperCase()}
+                      {user?.username?.charAt(0).toUpperCase()}
                     </div>
                     <div className="text-center sm:text-left">
                       <h2 className="text-xl sm:text-2xl font-bold text-white">
                         {user?.full_name}
                       </h2>
+                      <p className="text-blue-200">@{user?.username}</p>
                     </div>
                   </div>
                   {!isEditing && (
@@ -280,7 +278,7 @@ const Profile = () => {
                 </div>
 
                 {/* Profile Form */}
-                <div className="space-y-6">
+                <form onSubmit={handleSaveProfile} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-blue-100 text-sm font-medium mb-2">
@@ -289,7 +287,7 @@ const Profile = () => {
                       <input
                         type="text"
                         name="username"
-                        value={formData?.username || ""}
+                        value={formData.username}
                         onChange={handleInputChange}
                         disabled={!isEditing}
                         className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
@@ -302,7 +300,7 @@ const Profile = () => {
                       <input
                         type="text"
                         name="full_name"
-                        value={formData?.full_name || ""}
+                        value={formData.full_name}
                         onChange={handleInputChange}
                         disabled={!isEditing}
                         className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
@@ -315,7 +313,7 @@ const Profile = () => {
                       <input
                         type="email"
                         name="email"
-                        value={formData?.email || ""}
+                        value={formData.email}
                         onChange={handleInputChange}
                         disabled={!isEditing}
                         className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
@@ -329,7 +327,7 @@ const Profile = () => {
                         type="url"
                         name="facebook_account_link"
                         placeholder="https://facebook.com/your.profile"
-                        value={formData?.facebook_account_link || ""}
+                        value={formData.facebook_account_link}
                         onChange={handleInputChange}
                         disabled={!isEditing}
                         className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition"
@@ -340,22 +338,34 @@ const Profile = () => {
                   {isEditing && (
                     <div className="flex gap-3 pt-4">
                       <button
-                        onClick={handleSaveProfile}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+                        type="submit"
+                        disabled={loading}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:opacity-50"
                       >
-                        <Save size={18} />
-                        Save Changes
+                        {loading ? (
+                          <>
+                            <ClipLoader size={18} color="#fff" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save size={18} />
+                            Save Changes
+                          </>
+                        )}
                       </button>
                       <button
+                        type="button"
                         onClick={handleCancel}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center gap-2"
+                        disabled={loading}
+                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center gap-2 disabled:opacity-50"
                       >
                         <X size={18} />
                         Cancel
                       </button>
                     </div>
                   )}
-                </div>
+                </form>
               </div>
             )}
 
@@ -371,7 +381,7 @@ const Profile = () => {
                   <h3 className="text-lg font-bold text-white mb-6">
                     Change Password
                   </h3>
-                  <div className="space-y-4">
+                  <form onSubmit={handleNewPassSubmit} className="space-y-4">
                     <div>
                       <label className="block text-blue-100 text-sm font-medium mb-2">
                         Current Password
@@ -383,6 +393,7 @@ const Profile = () => {
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition"
                         placeholder="Enter current password"
+                        required
                       />
                     </div>
                     <div>
@@ -397,8 +408,10 @@ const Profile = () => {
                           onChange={handlePasswordChange}
                           className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition"
                           placeholder="Enter new password"
+                          required
                         />
                         <button
+                          type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-2.5 text-blue-300 hover:text-white"
                         >
@@ -444,10 +457,10 @@ const Profile = () => {
                             <p
                               className={`text-xs ${
                                 passwordStrength === "weak"
-                                  ? "text-red-600"
+                                  ? "text-red-400"
                                   : passwordStrength === "medium"
-                                  ? "text-yellow-600"
-                                  : "text-green-600"
+                                  ? "text-yellow-400"
+                                  : "text-green-400"
                               }`}
                             >
                               {passwordStrength === "weak" && "Weak password"}
@@ -456,12 +469,12 @@ const Profile = () => {
                               {passwordStrength === "strong" &&
                                 "Strong password"}
                             </p>
-                            <ul className="mt-2 text-xs space-y-1">
+                            <ul className="mt-2 text-xs space-y-1 text-blue-200">
                               <li
                                 className={
                                   newPassword.length >= 8
-                                    ? "text-green-600"
-                                    : "text-gray-500"
+                                    ? "text-green-400"
+                                    : "text-gray-400"
                                 }
                               >
                                 {newPassword.length >= 8 ? "✓" : "○"} At least 8
@@ -470,8 +483,8 @@ const Profile = () => {
                               <li
                                 className={
                                   /[A-Z]/.test(newPassword)
-                                    ? "text-green-600"
-                                    : "text-gray-500"
+                                    ? "text-green-400"
+                                    : "text-gray-400"
                                 }
                               >
                                 {/[A-Z]/.test(newPassword) ? "✓" : "○"} One
@@ -480,8 +493,8 @@ const Profile = () => {
                               <li
                                 className={
                                   /[a-z]/.test(newPassword)
-                                    ? "text-green-600"
-                                    : "text-gray-500"
+                                    ? "text-green-400"
+                                    : "text-gray-400"
                                 }
                               >
                                 {/[a-z]/.test(newPassword) ? "✓" : "○"} One
@@ -490,8 +503,8 @@ const Profile = () => {
                               <li
                                 className={
                                   /\d/.test(newPassword)
-                                    ? "text-green-600"
-                                    : "text-gray-500"
+                                    ? "text-green-400"
+                                    : "text-gray-400"
                                 }
                               >
                                 {/\d/.test(newPassword) ? "✓" : "○"} One number
@@ -499,8 +512,8 @@ const Profile = () => {
                               <li
                                 className={
                                   /[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
-                                    ? "text-green-600"
-                                    : "text-gray-500"
+                                    ? "text-green-400"
+                                    : "text-gray-400"
                                 }
                               >
                                 {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
@@ -525,8 +538,10 @@ const Profile = () => {
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition"
                           placeholder="Confirm new password"
+                          required
                         />
                         <button
+                          type="button"
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
                           }
@@ -542,8 +557,8 @@ const Profile = () => {
                     </div>
 
                     <button
-                      onClick={handleNewPassSubmit}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                      type="submit"
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 disabled:opacity-50"
                       disabled={loading}
                     >
                       {loading ? (
@@ -555,7 +570,7 @@ const Profile = () => {
                         <>Change Password</>
                       )}
                     </button>
-                  </div>
+                  </form>
                 </div>
               </div>
             )}

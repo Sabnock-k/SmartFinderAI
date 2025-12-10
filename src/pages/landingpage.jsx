@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import useAuth from "../../api/hooks/useAuth.js";
 import { useNavigate } from "react-router-dom";
 import {
   Facebook,
@@ -28,23 +29,23 @@ const FeatureCard = ({ icon, title, description, aosAnimation }) => (
 
 // Main App Component (Landing Page)
 const LandingPage = () => {
+  const navigate = useNavigate();
+  const { user, authChecked } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // index to cycle through images
   const [imgIndex, setImgIndex] = useState(0);
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authChecked && user) {
+      if (user.is_admin === true) {
+        navigate("/admin");
+      }
+      navigate("/home");
+    }
+  }, [authChecked, user]);
 
   // Images for the About section
   const cfactionimg = ["cfaction.png", "cfaction2.png"];
-
-  // redirect to /home if user is logged in
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      navigate("/home");
-    } else {
-      navigate("/");
-    }
-  }, [navigate]);
 
   useEffect(() => {
     AOS.init({

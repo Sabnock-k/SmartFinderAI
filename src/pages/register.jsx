@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import useAuth from "../../api/hooks/useAuth.js";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
@@ -11,6 +12,7 @@ import "aos/dist/aos.css";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function Register() {
+  const { user, authChecked } = useAuth();
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,9 +26,14 @@ function Register() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) navigate("/home");
-  }, []);
+    if (authChecked && user) {
+      if (user.is_admin === true) {
+        navigate("/admin");
+      }
+
+      navigate("/home");
+    }
+  }, [authChecked, user]);
 
   useEffect(() => {
     AOS.init({ duration: 800, once: false });

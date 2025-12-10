@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNav from "../../components/admin-nav";
+import useAuth from "../../../api/hooks/useAuth";
 import ItemDetailModal from "../../components/admin-viewItemModal";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Package,
@@ -18,7 +20,7 @@ import { ClipLoader } from "react-spinners";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const ReportedItems = () => {
-  const [user] = useState(JSON.parse(localStorage.getItem("user") || "null"));
+  const { user, authChecked } = useAuth();
   const [reportedItems, setReportedItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,11 +29,15 @@ const ReportedItems = () => {
   const [actionLoading, setActionLoading] = useState(null);
   const [error, setError] = useState(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (!user || user.is_admin !== true) {
-      window.location.href = "/home";
+    if (authChecked && user) {
+      if (user.is_admin !== true) {
+        navigate("/home");
+      }
     }
-  }, [user]);
+  }, [authChecked, user]);
 
   const fetchItems = async () => {
     try {

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNav from "../../components/admin-nav";
+import useAuth from "../../../api/hooks/useAuth";
 import ItemDetailModal from "../../components/admin-viewItemModal";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Package,
@@ -21,7 +23,7 @@ import "react-toastify/dist/ReactToastify.css";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const ApprovedItems = () => {
-  const [user] = useState(JSON.parse(localStorage.getItem("user") || "null"));
+  const { user, authChecked } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -33,11 +35,15 @@ const ApprovedItems = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [error, setError] = useState(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (!user || user.is_admin !== true) {
-      window.location.href = "/home";
+    if (authChecked && user) {
+      if (user.is_admin !== true) {
+        navigate("/home");
+      }
     }
-  }, [user]);
+  }, [authChecked, user]);
 
   const fetchApprovedItems = async () => {
     try {
