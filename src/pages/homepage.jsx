@@ -4,29 +4,23 @@ import axios from "axios";
 import Navbar from "../components/navbar.jsx";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import useAuth from "../../api/hooks/useAuth.js";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const Homepage = () => {
-  const [user, setUser] = useState(null);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const { user, authChecked } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-      setLoggedIn(true);
-
-      // Check if user is admin
-      if (storedUser.is_admin === true) {
-        setLoggedIn(false);
+    if (authChecked && user) {
+      if (user.is_admin === true) {
         navigate("/admin");
       }
     }
-  }, []);
+  }, [authChecked, user]);
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
@@ -74,16 +68,6 @@ const Homepage = () => {
       "bg-gradient-to-tr from-gray-700 via-blue-900 to-blue-800",
     ],
   ];
-
-  if (!loggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-800">
-        <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-          <p className="text-lg font-medium">Please login to view this page.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">

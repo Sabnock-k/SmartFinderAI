@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/navbar.jsx";
+import useAuth from "../../api/hooks/useAuth.js";
 import formatDate from "../components/date-format.jsx";
 import {
   Search,
@@ -14,8 +15,7 @@ import {
 } from "lucide-react";
 
 const SearchPage = () => {
-  const [user, setUser] = useState(null);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const { user, authChecked } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [imageError, setImageError] = useState(false);
@@ -29,18 +29,12 @@ const SearchPage = () => {
   const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-      setLoggedIn(true);
-
-      // Check if user is admin
-      if (storedUser.is_admin === true) {
-        setLoggedIn(false);
+    if (authChecked && user) {
+      if (user.is_admin === true) {
         navigate("/admin");
       }
     }
-  }, []);
+  }, [authChecked, user]);
 
   const showToast = (message, type = "info") => {
     setToast({ message, type });
@@ -152,16 +146,6 @@ const SearchPage = () => {
       item.status === "attempting to claim"
     );
   };
-
-  if (!loggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-800">
-        <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-          <p className="text-lg font-medium">Please login to view this page.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab] relative overflow-hidden">

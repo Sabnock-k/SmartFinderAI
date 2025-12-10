@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminNav from "../../components/admin-nav";
+import useAuth from "../../../api/hooks/useAuth";
 import axios from "axios";
 import {
   UserX,
@@ -18,8 +19,7 @@ import { useNavigate } from "react-router-dom";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const UsersPage = () => {
-  const navigate = useNavigate();
-  const [user] = useState(JSON.parse(localStorage.getItem("user") || "null"));
+  const { user, authChecked } = useAuth();
 
   // Data state
   const [users, setUsers] = useState([]);
@@ -38,12 +38,16 @@ const UsersPage = () => {
     direction: "desc",
   });
 
+  const navigate = useNavigate();
+
   // Auth check
   useEffect(() => {
-    if (!user?.is_admin) {
-      navigate("/home");
+    if (authChecked && user) {
+      if (user.is_admin !== true) {
+        navigate("/home");
+      }
     }
-  }, [user, navigate]);
+  }, [authChecked, user]);
 
   // Fetch users on mount
   useEffect(() => {

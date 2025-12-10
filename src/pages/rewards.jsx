@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/navbar";
+import useAuth from "../../api/hooks/useAuth";
 import QRModal from "../components/QRmodal";
 import {
   Gift,
@@ -20,7 +21,7 @@ import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const RewardsPage = () => {
-  const [user] = useState(JSON.parse(localStorage.getItem("user") || "null"));
+  const { user, authChecked } = useAuth();
   const [loading, setLoading] = useState(true);
   const [userPoints, setUserPoints] = useState(0);
   const [rewardsCatalog, setRewardsCatalog] = useState([]);
@@ -58,6 +59,14 @@ const RewardsPage = () => {
   };
 
   const rewardColor = "from-blue-500 to-blue-700";
+
+  useEffect(() => {
+    if (authChecked && user) {
+      if (user.is_admin === true) {
+        navigate("/admin");
+      }
+    }
+  }, [authChecked, user]);
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });

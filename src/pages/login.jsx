@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import useAuth from "../../api/hooks/useAuth.js";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
 import AOS from "aos";
@@ -9,6 +10,7 @@ import { ClipLoader } from "react-spinners";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function Login() {
+  const { user, authChecked } = useAuth({ redirectToLogin: false }); // ✅ Don't redirect to login from login page
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,15 +19,17 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      navigate("/home");
-    }
-  }, [navigate]);
-
-  useEffect(() => {
     AOS.init({ duration: 800, once: false });
   }, []);
+
+  useEffect(() => {
+    if (authChecked && user) {
+      if (user.is_admin === true) {
+        navigate("/admin");
+      }
+      navigate("/home");
+    }
+  }, [authChecked, user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,7 +40,7 @@ function Login() {
         password,
       });
       setError("");
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.data.token);
       navigate("/home");
     } catch (err) {
       setError(err.response?.data?.error || "Login failed");
