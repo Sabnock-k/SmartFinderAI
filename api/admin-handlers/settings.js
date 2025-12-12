@@ -120,7 +120,7 @@ router.get("/settings", async (req, res) => {
  * POST /api/admin/settings
  * ============================
  */
-router.post("/settings", async (req, res) => {
+router.post("/update-settings", async (req, res) => {
   try {
     const { auto_approve, expiration_days } = req.body;
 

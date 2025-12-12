@@ -42,7 +42,7 @@ const SettingsPage = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/admin/settings`);
+        const res = await axios.get(`${API_BASE}/api/admin/settings/settings`);
         setAutoApprove(res.data.auto_approve);
         setExpirationDays(res.data.expiration_days);
       } catch (err) {
@@ -125,7 +125,7 @@ const SettingsPage = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${API_BASE}/api/admin/update-password`,
+        `${API_BASE}/api/admin/settings/update-password`,
         {
           userId: user.user_id,
           currentPassword: passwordData.currentPassword,
@@ -164,10 +164,13 @@ const SettingsPage = () => {
     setIsSavingSettings(true);
 
     try {
-      const res = await axios.post(`${API_BASE}/api/admin/settings`, {
-        auto_approve: autoApprove,
-        expiration_days: expirationDays,
-      });
+      const res = await axios.post(
+        `${API_BASE}/api/admin/settings/update-settings`,
+        {
+          auto_approve: autoApprove,
+          expiration_days: expirationDays,
+        }
+      );
       setSettingsSuccess(res.data.message || "Settings updated successfully!");
     } catch (err) {
       setSettingsError("Failed to save settings.");
