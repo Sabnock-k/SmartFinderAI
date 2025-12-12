@@ -106,7 +106,7 @@ router.post("/", async (req, res) => {
          VALUES ($1, $2, $3)`,
         [
           reported_by_user_id,
-          newItem.found_item_id,
+          result.rows[0].found_item_id,
           "Your found item has been automatically approved! You earned 20 points.",
         ]
       );
