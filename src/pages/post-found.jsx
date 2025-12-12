@@ -156,10 +156,13 @@ const PostFound = () => {
         image_url: imageUrl,
       });
 
-      toast.success("Found item uploaded successfully! 🎉", {
+      const backendMessage = res.data.message || "Item uploaded";
+
+      toast.success(backendMessage, {
         position: "top-center",
         autoClose: 3000,
       });
+
       setFormData({
         description: "",
         category: "",
