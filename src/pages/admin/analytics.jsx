@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNav from "../../components/admin-nav";
 import useAuth from "../../../api/hooks/useAuth";
+import { generateAnalyticsPDF } from "../../../api/utils/pdfGenerator";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
@@ -16,6 +17,7 @@ import {
   BarChart3,
   Heart,
   Gift,
+  Download,
 } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -104,6 +106,7 @@ const AnalyticsPage = () => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
 
   const navigate = useNavigate();
 
@@ -176,6 +179,20 @@ const AnalyticsPage = () => {
     fetchAnalytics();
   }, [user]);
 
+  const handleDownloadPDF = async () => {
+    if (!analytics) return;
+
+    setGeneratingPDF(true);
+    try {
+      await generateAnalyticsPDF(analytics);
+    } catch (err) {
+      console.error("Error generating PDF:", err);
+      alert("Failed to generate PDF. Please try again.");
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab]">
@@ -210,14 +227,24 @@ const AnalyticsPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#1a237e] via-[#283593] to-[#3949ab] pb-12">
       <AdminNav />
       <div className="max-w-7xl mx-auto px-4 py-10">
-        {/* Header */}
-        <div className="mb-8">
-          <h2 className="text-white text-4xl font-bold mb-2">
-            System Analytics Dashboard
-          </h2>
-          <p className="text-blue-200 text-lg">
-            Real-time insights and performance metrics
-          </p>
+        {/* Header with Download Button */}
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h2 className="text-white text-4xl font-bold mb-2">
+              System Analytics Dashboard
+            </h2>
+            <p className="text-blue-200 text-lg">
+              Real-time insights and performance metrics
+            </p>
+          </div>
+          <button
+            onClick={handleDownloadPDF}
+            disabled={generatingPDF}
+            className="bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-5 h-5" />
+            {generatingPDF ? "Generating..." : "Download PDF"}
+          </button>
         </div>
 
         {analytics && (
