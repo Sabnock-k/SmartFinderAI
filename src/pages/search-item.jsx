@@ -395,6 +395,9 @@ const SearchPage = () => {
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-2xl font-bold text-gray-800">
                   Item Details
+                  <h2 className="text-2xl text-blue-600 font-medium">
+                    Match Score: {(selectedItem.match_score * 100).toFixed(1)}%
+                  </h2>
                 </h2>
                 <button
                   onClick={() => setSelectedItem(null)}
