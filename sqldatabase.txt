@@ -7,9 +7,6 @@ USE campusfinder_ai;
 
 -- vector
 CREATE EXTENSION IF NOT EXISTS vector;
-ALTER TABLE found_items
-  ALTER COLUMN embedding TYPE vector(3072) USING embedding::vector;
-
 
 -- Table: users
 CREATE TABLE users (
@@ -85,14 +82,12 @@ CREATE TABLE claimed_items (
 );
 
 -- Table: notifications
-CREATE TABLE notifications (
-    notification_id INT AUTO_INCREMENT PRIMARY KEY,
-    recipient_user_id INT NOT NULL,
-    found_item_id INT NOT NULL,
+CREATE TABLE IF NOT EXISTS notifications (
+    notification_id SERIAL PRIMARY KEY,
+    recipient_user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    found_item_id INT NOT NULL REFERENCES found_items(found_item_id) ON DELETE CASCADE,
     message TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (recipient_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (found_item_id) REFERENCES found_items(found_item_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- REWARDS CATALOG (Available rewards)
