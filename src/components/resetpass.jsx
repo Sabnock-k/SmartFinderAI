@@ -33,9 +33,8 @@ function ResetPassword() {
     }
 
     // Redirect if already logged in
-    const sessionToken = localStorage.getItem("sessionToken");
-    const user = localStorage.getItem("user");
-    if (sessionToken && user) {
+    const user = localStorage.getItem("token");
+    if (user) {
       navigate("/home");
     }
 

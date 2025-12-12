@@ -12,7 +12,7 @@ import "aos/dist/aos.css";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function Register() {
-  const { user, authChecked } = useAuth();
+  const { user, authChecked } = useAuth({ redirectToLogin: false });
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,8 +30,6 @@ function Register() {
       if (user.is_admin === true) {
         navigate("/admin");
       }
-
-      navigate("/home");
     }
   }, [authChecked, user]);
 
