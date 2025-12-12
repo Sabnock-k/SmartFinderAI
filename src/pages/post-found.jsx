@@ -131,8 +131,6 @@ const PostFound = () => {
           contentType: imageFile.type,
         });
 
-      console.log("UPLOAD RESULT:", { data, error });
-
       if (error) {
         toast.error("Image upload failed.");
         setIsLoading(false);
