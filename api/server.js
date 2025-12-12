@@ -18,7 +18,7 @@ import rewardsHandler from "./handlers/rewards.js";
 import founderInfoHandler from "./handlers/founder-info.js";
 
 // Admin imports
-import updatePasswordHandlerAdmin from "./admin-handlers/update-password.js";
+import getSettingsHandler from "./admin-handlers/settings.js";
 import getAnalyticsHandler from "./admin-handlers/analytics.js";
 import getUsersHandler from "./admin-handlers/users.js";
 import getReportedItemsHandler from "./admin-handlers/reported-items.js";
@@ -55,7 +55,7 @@ app.use("/api/rewards", rewardsHandler);
 app.use("/api/founder-info", founderInfoHandler);
 
 // Admin routes
-app.use("/api/admin/update-password", updatePasswordHandlerAdmin);
+app.use("/api/admin/settings", getSettingsHandler);
 app.use("/api/admin/analytics", getAnalyticsHandler);
 app.use("/api/admin/users", getUsersHandler);
 app.use("/api/admin/reported-items", getReportedItemsHandler);
