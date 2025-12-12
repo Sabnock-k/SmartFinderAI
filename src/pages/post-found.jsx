@@ -147,7 +147,7 @@ const PostFound = () => {
     }
 
     try {
-      await axios.post(`${API_BASE}/api/found-item`, {
+      const res = await axios.post(`${API_BASE}/api/found-item`, {
         reported_by_user_id: user.user_id,
         description: formData.description,
         category: formData.category,
