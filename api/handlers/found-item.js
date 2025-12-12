@@ -111,14 +111,14 @@ router.post("/", async (req, res) => {
         ]
       );
 
-      res.status(201).json({
+      return res.status(201).json({
         message:
           "Found item uploaded successfully! and has been automatically approved!",
         item: result.rows[0],
       });
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Found item uploaded successfully!",
       item: result.rows[0],
     });
