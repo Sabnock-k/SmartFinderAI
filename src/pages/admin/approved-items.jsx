@@ -97,14 +97,6 @@ const ApprovedItems = () => {
   };
 
   const handleReunited = async (id) => {
-    if (
-      !window.confirm(
-        "Confirm that this item has been successfully returned to its owner? The reporter will earn 100 points."
-      )
-    ) {
-      return;
-    }
-
     try {
       setReunitingId(id);
       await axios.put(`${API_BASE}/api/admin/approved-items/${id}/reunited`);
@@ -164,7 +156,9 @@ const ApprovedItems = () => {
   const getItemStatus = (item) => {
     if (item.reunited || item.admin_approved) return "reunited";
     if (item.founder_confirmed && item.claimer_confirmed) return "confirmed";
-    if (item.status === "claimed") return "pending";
+    if (item.claim_request_exists && !item.admin_approved && !item.reunited) {
+      return "attempting";
+    }
     return "available";
   };
 
@@ -206,10 +200,10 @@ const ApprovedItems = () => {
         text: "text-green-700",
         label: "Available",
       },
-      pending: {
-        bg: "bg-yellow-100",
-        text: "text-yellow-700",
-        label: "Pending Claim",
+      attempting: {
+        bg: "bg-orange-100",
+        text: "text-orange-700",
+        label: "A person is attempting to claim",
       },
       confirmed: {
         bg: "bg-blue-100",

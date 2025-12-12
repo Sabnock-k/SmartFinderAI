@@ -13,7 +13,8 @@ router.get("/", async (req, res) => {
         u.full_name,
         cr.founder_confirmed,
         cr.claimer_confirmed,
-        cr.admin_approved
+        cr.admin_approved,
+        (cr.found_item_id IS NOT NULL) AS claim_request_exists
       FROM found_items AS fi
       JOIN users AS u ON fi.reported_by_user_id = u.user_id
       LEFT JOIN claim_requests AS cr ON fi.found_item_id = cr.found_item_id
