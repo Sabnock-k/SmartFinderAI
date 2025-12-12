@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbar.jsx";
+import useAuth from "../../api/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import {
   Upload,
