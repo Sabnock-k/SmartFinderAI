@@ -19,7 +19,7 @@ import "aos/dist/aos.css";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const PostFound = () => {
-  const [user, setUser] = useState(null);
+  const { user, authChecked } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null); // New state for the image file
