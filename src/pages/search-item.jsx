@@ -19,6 +19,7 @@ const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [imageError, setImageError] = useState(false);
+  const [isPictureModalOpen, setIsPictureModalOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -411,13 +412,39 @@ const SearchPage = () => {
                 <img
                   src={selectedItem.image_url}
                   alt={selectedItem.description}
-                  onError={() => setImageError(true)}
+                  onClick={() => setIsPictureModalOpen(true)}
                   className="w-full h-64 object-cover rounded-xl border-2 border-blue-100 mb-4"
                 />
               ) : (
                 <div className="h-48 w-full bg-gray-200 flex flex-col items-center justify-center text-gray-500 rounded-xl mb-4">
                   <ImageOff className="w-12 h-12 mb-1" />
                   <p className="text-sm">No Image Available</p>
+                </div>
+              )}
+
+              {isPictureModalOpen && (
+                <div
+                  className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 backdrop-blur-sm"
+                  onClick={() => setIsPictureModalOpen(false)}
+                >
+                  <div
+                    className="relative bg-white rounded-xl shadow-2xl p-4 max-w-lg w-full mx-4 animate-fadeIn"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Image */}
+                    <img
+                      src={selectedItem.image_url}
+                      alt={selectedItem.description}
+                      className="w-full h-auto rounded-lg object-contain"
+                    />
+
+                    {/* Optional description */}
+                    {selectedItem.description && (
+                      <p className="mt-2 text-gray-700 text-center">
+                        {selectedItem.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
 

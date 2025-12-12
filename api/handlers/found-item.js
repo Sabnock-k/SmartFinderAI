@@ -18,6 +18,24 @@ async function getEmbedding(description, location, dateTimeFound) {
   return response.data[0].embedding; // returns array of numbers
 }
 
+//Helper: function to check auto-approve setting
+async function shouldAutoApprove() {
+  try {
+    const result = await pool.query(
+      "SELECT auto_approve FROM system_settings WHERE id = 1"
+    );
+
+    if (result.rows.length === 0) {
+      return false; // Default to manual approval
+    }
+
+    return result.rows[0].auto_approve;
+  } catch (error) {
+    console.error("Error checking auto-approve setting:", error);
+    return false; // Default to manual approval on error
+  }
+}
+
 router.post("/", async (req, res) => {
   try {
     const {
@@ -54,11 +72,14 @@ router.post("/", async (req, res) => {
 
     const vectorLiteral = `[${embedding.join(",")}]`;
 
+    // Check if auto-approve is enabled
+    const autoApprove = await shouldAutoApprove();
+
     //  Insert into DB with embedding
     const result = await pool.query(
       `INSERT INTO found_items 
-         (reported_by_user_id, description, category, image_url, location_description, date_time_found, embedding) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7::vector)
+         (reported_by_user_id, description, category, image_url, location_description, date_time_found, embedding, is_approved) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7::vector, $8)
          RETURNING *`,
       [
         reported_by_user_id,
@@ -68,10 +89,36 @@ router.post("/", async (req, res) => {
         location_description || null,
         date_time_found,
         vectorLiteral,
+        autoApprove,
       ]
     );
 
-    res.status(201).json({
+    // If auto-approved, award points immediately
+    if (autoApprove) {
+      await pool.query(
+        "UPDATE users SET points = points + 20 WHERE user_id = $1",
+        [reported_by_user_id]
+      );
+
+      // Create notification for the user
+      await pool.query(
+        `INSERT INTO notifications (recipient_user_id, found_item_id, message)
+         VALUES ($1, $2, $3)`,
+        [
+          reported_by_user_id,
+          result.rows[0].found_item_id,
+          "Your found item has been automatically approved! You earned 20 points.",
+        ]
+      );
+
+      return res.status(201).json({
+        message:
+          "Found item uploaded successfully! and has been automatically approved!",
+        item: result.rows[0],
+      });
+    }
+
+    return res.status(201).json({
       message: "Found item uploaded successfully!",
       item: result.rows[0],
     });

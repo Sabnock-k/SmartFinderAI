@@ -131,8 +131,6 @@ const PostFound = () => {
           contentType: imageFile.type,
         });
 
-      console.log("UPLOAD RESULT:", { data, error });
-
       if (error) {
         toast.error("Image upload failed.");
         setIsLoading(false);
@@ -147,7 +145,7 @@ const PostFound = () => {
     }
 
     try {
-      await axios.post(`${API_BASE}/api/found-item`, {
+      const res = await axios.post(`${API_BASE}/api/found-item`, {
         reported_by_user_id: user.user_id,
         description: formData.description,
         category: formData.category,
@@ -156,10 +154,13 @@ const PostFound = () => {
         image_url: imageUrl,
       });
 
-      toast.success("Found item uploaded successfully! 🎉", {
+      const backendMessage = res.data.message || "Item uploaded";
+
+      toast.success(backendMessage, {
         position: "top-center",
         autoClose: 3000,
       });
+
       setFormData({
         description: "",
         category: "",
