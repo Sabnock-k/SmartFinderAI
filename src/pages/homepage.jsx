@@ -11,6 +11,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const Homepage = () => {
   const { user, authChecked } = useAuth();
   const [stats, setStats] = useState(null);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -130,15 +131,13 @@ const Homepage = () => {
             </button>
           </div>
         </div>
-        <div className="text-center text-blue-200 text-sm mt-2">
-          Need help?{" "}
-          <a href="/faq" className="underline hover:text-white">
-            FAQ
-          </a>{" "}
-          &nbsp;|&nbsp;{" "}
-          <a href="/contact" className="underline hover:text-white">
-            Contact
-          </a>
+        <div className="text-center mt-2">
+          <button
+            onClick={() => setShowPrivacy(true)}
+            className="text-blue-200 hover:text-white underline hover:scale-105 transition"
+          >
+            View Privacy Policy
+          </button>
         </div>
       </main>
 
@@ -161,6 +160,110 @@ const Homepage = () => {
             )}
           </div>
         ))}
+        {showPrivacy && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 px-4">
+            <div
+              className="bg-white max-w-2xl w-full p-6 md:p-8 rounded-2xl shadow-2xl border border-blue-200"
+              data-aos="zoom-in"
+            >
+              <h2 className="text-2xl font-bold text-blue-900 mb-4 text-center">
+                Privacy Policy
+              </h2>
+
+              <div className="max-h-80 overflow-y-auto pr-2 space-y-4 text-gray-700 leading-relaxed text-sm">
+                <h3 className="font-semibold text-blue-800">
+                  1. Information Collected
+                </h3>
+                <p>CAMPUSFIND may collect the following information:</p>
+                <ul className="list-disc ml-5 space-y-1">
+                  <li>User account details (name, email, role)</li>
+                  <li>
+                    Item report details (descriptions, images, dates, locations)
+                  </li>
+                  <li>System usage data for platform improvement</li>
+                </ul>
+
+                <h3 className="font-semibold text-blue-800">
+                  2. Use of Information
+                </h3>
+                <p>Collected data may be used to:</p>
+                <ul className="list-disc ml-5 space-y-1">
+                  <li>Facilitate lost-and-found matching</li>
+                  <li>Verify ownership claims</li>
+                  <li>Improve system performance and security</li>
+                  <li>Generate administrative and system reports</li>
+                </ul>
+
+                <h3 className="font-semibold text-blue-800">
+                  3. Data Protection
+                </h3>
+                <ul className="list-disc ml-5 space-y-1">
+                  <li>
+                    User data is securely stored and restricted to authorized
+                    personnel only.
+                  </li>
+                  <li>
+                    Technical and administrative safeguards are implemented to
+                    prevent unauthorized access.
+                  </li>
+                </ul>
+
+                <h3 className="font-semibold text-blue-800">4. Data Sharing</h3>
+                <p>
+                  Personal information is not shared with external third
+                  parties, except when required by institutional policies or
+                  applicable law.
+                </p>
+
+                <h3 className="font-semibold text-blue-800">
+                  5. Data Retention
+                </h3>
+                <ul className="list-disc ml-5 space-y-1">
+                  <li>
+                    User and item data is retained only as long as necessary for
+                    platform operation and administration.
+                  </li>
+                  <li>
+                    Records of unclaimed items may be archived after the Claim
+                    Period expires.
+                  </li>
+                </ul>
+
+                <h3 className="font-semibold text-blue-800">6. User Rights</h3>
+                <p>Users may request to:</p>
+                <ul className="list-disc ml-5 space-y-1">
+                  <li>Access and update their personal information</li>
+                  <li>
+                    Request account deletion, subject to institutional
+                    guidelines
+                  </li>
+                </ul>
+
+                <h3 className="font-semibold text-blue-800">
+                  7. Policy Updates
+                </h3>
+                <p>
+                  This Privacy Policy may be updated as needed. Any changes will
+                  be reflected within the platform.
+                </p>
+
+                <p className="italic text-gray-600">
+                  By using CAMPUSFIND, you acknowledge that you have read,
+                  understood, and agreed to these Terms and Policies.
+                </p>
+              </div>
+
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={() => setShowPrivacy(false)}
+                  className="px-6 py-2 bg-blue-800 text-white rounded-full font-semibold shadow hover:bg-blue-900 transition cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );

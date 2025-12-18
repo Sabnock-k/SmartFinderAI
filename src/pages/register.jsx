@@ -23,6 +23,10 @@ function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState("");
+
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,6 +82,13 @@ function Register() {
     // Validate password match
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    // Validate terms agreement
+    if (!termsAccepted) {
+      setError("You must accept the Terms and Conditions to continue.");
       setLoading(false);
       return;
     }
@@ -416,6 +427,27 @@ function Register() {
                 </>
               )}
             </button>
+
+            {/* Terms and Conditions */}
+            <div className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                className="mt-1 cursor-pointer accent-[#3949ab]"
+                disabled={loading}
+              />
+              <p className="text-gray-700">
+                I agree to the{" "}
+                <button
+                  type="button"
+                  onClick={() => setShowTermsModal(true)}
+                  className="text-[#3949ab] underline hover:text-[#1a237e]"
+                >
+                  Terms and Conditions
+                </button>
+              </p>
+            </div>
           </form>
 
           {/* Footer */}
@@ -456,6 +488,187 @@ function Register() {
       </div>
 
       <ToastContainer />
+
+      {/* Terms Modal */}
+      {showTermsModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
+            <h2 className="text-xl font-bold text-[#1a237e] mb-4">
+              Terms and Conditions
+            </h2>
+
+            <div className="text-[#1a237e] text-sm max-h-72 overflow-y-auto pr-2 space-y-4 leading-relaxed">
+              <section>
+                <p className="font-semibold text-base text-[#283593]">
+                  Welcome to CAMPUSFIND
+                </p>
+                <p className="text-gray-700">
+                  CAMPUSFIND is a digital lost-and-found platform designed to
+                  help the campus community report, search, and recover lost
+                  items. By accessing or using CAMPUSFIND, you agree to comply
+                  with and be bound by the following Terms and Conditions. If
+                  you do not agree, please discontinue use of the platform.
+                </p>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-base text-[#283593]">
+                  1. Purpose of the Platform
+                </h3>
+                <p className="text-gray-700">
+                  CAMPUSFIND is intended solely for use within the campus
+                  community to facilitate reporting, tracking, and claiming of
+                  lost and found items. The platform serves as an information
+                  system only and does not guarantee recovery of items.
+                </p>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-base text-[#283593]">
+                  2. User Eligibility and Responsibilities
+                </h3>
+                <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                  <li>
+                    Users must be students, faculty, staff, or authorized
+                    personnel.
+                  </li>
+                  <li>Information must be accurate and truthful.</li>
+                  <li>No false or fraudulent reports are allowed.</li>
+                  <li>Users must secure their account credentials.</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-base text-[#283593]">
+                  3. Reporting Lost and Found Items
+                </h3>
+                <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                  <li>Descriptions must be complete and accurate.</li>
+                  <li>Images must be appropriate and relevant.</li>
+                  <li>Admins may remove or edit reports that violate rules.</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-base text-[#283593]">
+                  4. Claiming of Items
+                </h3>
+                <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                  <li>Proof of ownership may be required.</li>
+                  <li>Unverifiable claims may be denied.</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-base text-[#283593]">
+                  5. Unclaimed Items Policy (Time-Based Ownership Status)
+                </h3>
+
+                <h4 className="font-medium text-[#3949ab] mt-2">
+                  5.1 Claim Period
+                </h4>
+                <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                  <li>
+                    Each item is subject to a Claim Period based on admin
+                    settings.
+                  </li>
+                  <li>
+                    Claim Period begins once item is logged in the system.
+                  </li>
+                </ul>
+
+                <h4 className="font-medium text-[#3949ab] mt-2">
+                  5.2 Status During Claim Period
+                </h4>
+                <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                  <li>Items remain marked as “Unclaimed.”</li>
+                  <li>Notifications remain active.</li>
+                </ul>
+
+                <h4 className="font-medium text-[#3949ab] mt-2">
+                  5.3 Expiration of Claim Period
+                </h4>
+                <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                  <li>
+                    Items automatically transition to “No Owner / Unclaimed
+                    Beyond Claim Period.”
+                  </li>
+                  <li>Number of days depends on admin policy.</li>
+                </ul>
+
+                <h4 className="font-medium text-[#3949ab] mt-2">
+                  5.4 Disposal Procedure
+                </h4>
+                <p className="text-gray-700">
+                  If the item remains unclaimed, it may be:
+                </p>
+                <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                  <li>Retained for institutional use</li>
+                  <li>Donated</li>
+                  <li>Responsibly disposed</li>
+                  <li>Transferred based on regulations</li>
+                </ul>
+                <p className="text-gray-700">
+                  CAMPUSFIND is not responsible for handling beyond Claim
+                  Period.
+                </p>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-base text-[#283593]">
+                  6. Administrative Rights
+                </h3>
+                <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                  <li>Modify claimable days</li>
+                  <li>Approve/deny claims</li>
+                  <li>Remove inappropriate content</li>
+                  <li>Suspend or ban users for abuse</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-base text-[#283593]">
+                  7. Limitation of Liability
+                </h3>
+                <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                  <li>Platform is provided “as-is.”</li>
+                  <li>Not liable for lost, damaged, or misused items.</li>
+                  <li>Not responsible for disputes.</li>
+                </ul>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-base text-[#283593]">
+                  8. Modifications to Terms
+                </h3>
+                <p className="text-gray-700">
+                  CAMPUSFIND may modify these Terms anytime. Continued use
+                  signifies acceptance of changes.
+                </p>
+              </section>
+
+              <section>
+                <h3 className="font-semibold text-base text-[#283593]">
+                  9. Contact & Support
+                </h3>
+                <p className="text-gray-700">
+                  For help or disputes, contact the campus Lost and Found Office
+                  or system administrator.
+                </p>
+              </section>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowTermsModal(false)}
+                className="px-4 py-2 rounded-lg border border-gray-400 text-gray-700 hover:bg-gray-100"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

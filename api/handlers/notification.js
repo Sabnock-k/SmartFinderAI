@@ -24,7 +24,8 @@ router.get("/:userId", async (req, res) => {
         FROM notifications n
         LEFT JOIN found_items fi ON n.found_item_id = fi.found_item_id
         LEFT JOIN users u ON fi.reported_by_user_id = u.user_id
-        WHERE n.recipient_user_id = $1
+        WHERE n.is_global = TRUE
+        OR n.recipient_user_id = $1
         ORDER BY n.created_at DESC`,
       [userId]
     );
@@ -60,9 +61,10 @@ router.delete("/:notificationId", async (req, res) => {
   try {
     const { notificationId } = req.params;
 
-    await pool.query("DELETE FROM notifications WHERE notification_id = $1", [
-      notificationId,
-    ]);
+    await pool.query(
+      "DELETE FROM notifications WHERE notification_id = $1 AND is_global = FALSE",
+      [notificationId]
+    );
 
     res.json({ message: "Notification deleted successfully" });
   } catch (error) {
@@ -76,9 +78,10 @@ router.delete("/clear/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    await pool.query("DELETE FROM notifications WHERE recipient_user_id = $1", [
-      userId,
-    ]);
+    await pool.query(
+      "DELETE FROM notifications WHERE recipient_user_id = $1 AND is_global = FALSE",
+      [userId]
+    );
 
     res.json({ message: "All notifications cleared successfully" });
   } catch (error) {
