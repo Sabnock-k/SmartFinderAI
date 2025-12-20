@@ -57,8 +57,8 @@ router.put("/:id/approve", async (req, res) => {
     // Create notification for all users about the new found item
     const message2 = `A new item has been found and is now available in the system.`;
     await pool.query(
-      "INSERT INTO notifications (found_item_id, message, is_global) VALUES ($1, $2, $3)",
-      [itemId, message2, true]
+      "INSERT INTO notifications (message, is_global) VALUES ($1, $2)",
+      [message2, true]
     );
 
     res.status(204).send();
