@@ -44,8 +44,9 @@ router.get("/:userId/count", async (req, res) => {
 
     const result = await pool.query(
       `SELECT COUNT(*) as count
-      FROM notifications
-      WHERE recipient_user_id = $1`,
+      FROM notifications n
+      WHERE n.is_global = TRUE
+      OR n.recipient_user_id = $1`,
       [userId]
     );
 
